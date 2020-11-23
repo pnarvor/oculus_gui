@@ -1,1 +1,9 @@
 .*.sw*
+__pycache__
+*.egg-info
+*.pick
+*.tif
+*.ply
+
+
+
