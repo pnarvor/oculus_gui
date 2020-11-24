@@ -4,6 +4,6 @@ __pycache__
 *.pick
 *.tif
 *.ply
-
+*.pyc
 
 
