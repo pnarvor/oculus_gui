@@ -24,6 +24,10 @@ class Session:
                 print('json         :\n', r.json(), end='\n\n')
 
     def __init__(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
+        self.connect(rootUrl, loginUrl)
+
+
+    def connect(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
         self.rootUrl  = rootUrl
         self.loginUrl = loginUrl
         self.session  = requests.session()
@@ -37,22 +41,18 @@ class Session:
         except KeyError:
             raise RuntimeError("Could not get csrf token from "+self.loginUrl
                                + ". Is the server running ?")
-
+        self.session.headers.update({'X-CSRFToken': self.csrfToken})
+        print("Connection to",  self.rootUrl, "succesful.")
+    
 
     def post(self, url, data):
-        headers = {'X-CSRFToken': self.csrfToken}
         files = {'file' : ('data', data)}
-        r = self.session.post(self.rootUrl + url, headers=headers, files=files)
+        r = self.session.post(self.rootUrl + url, files=files)
         return r
-
     
+
     def get(self, url):
-        headers = {'X-CSRFToken': self.csrfToken}
-        r = self.session.get(self.rootUrl + url, headers=headers)
+        r = self.session.get(self.rootUrl + url)
         return r
 
 
-    def delete(self, url):
-        headers = {'X-CSRFToken': self.csrfToken}
-        r = self.session.delete(self.rootUrl + url, headers=headers)
-        return r
