@@ -45,9 +45,9 @@ rm roboto
 
 # # plotly
 # wget -O payload_monitor/static/js/libs/plotly.js https://cdn.plot.ly/plotly-latest.js
-# 
-# # three
-# wget -O payload_monitor/static/js/libs/three.js https://raw.githubusercontent.com/mrdoob/three.js/dev/build/three.js
+
+# three
+wget -O payload_monitor/static/js/libs/three.js https://raw.githubusercontent.com/mrdoob/three.js/dev/build/three.js
 # wget -O payload_monitor/static/js/libs/OrbitControl.js https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/controls/OrbitControls.js
 
 
