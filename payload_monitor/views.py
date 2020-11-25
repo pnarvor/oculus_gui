@@ -9,88 +9,48 @@ def status(request):
     return render(request, 'status.html')
 
 @csrf_protect
-def status_update(request):
+def generic_update(request):
     if not request.method == 'POST':
         return HttpResponse(400)
-
-    print('\n\n\n')
-    for key,value in request.META.items():
-        print(key, ":", value)
-    print('\n\n\n')
-
-    for key,value in request.FILES.items():
-        print(key, ":", type(value))
-        # value.open()
-        for chunk in value.chunks():
-            print(chunk)
-
-    print('\n\n\n')
-    print("Type    :", type(request))
-    print("COOKIES :", request.COOKIES)
-    print("GET     :", request.GET)
-    print("FILES   :", request.FILES)
-    print("POST    :", request.POST)
-    print('\n\n\n')
-
-    return HttpResponse(200)
-
-
-@csrf_protect
-def ping_update(request):
-    if not request.method == 'POST':
-        return HttpResponse(400)
-
-    # print('\n\n\n')
-    # for key,value in request.META.items():
-    #     print(key, ":", value)
-    # print('\n\n\n')
     
-    # for key,value in request.FILES.items():
-    #     print(key, ":", type(value))
-    #     # value.open()
-    #     # for chunk in value.chunks():
-    #     #     print(chunk)
+    if 'raw_data' not in request.FILES and 'metadata' in request.POST:
+        # if no binary data, sending metadata data as "text"
+        metadata = request.POST['metadata']
+        # Have to do it this way for reasons explained below
+        for socket in consumers.register.values():
+            socket.update(text_data=metadata)
+    elif 'raw_data' in request.FILES:
+        # if binary data, sending metadata in the binary blob.
+        if 'metadata' in request.POST:
+            metadata = request.POST['metadata']
+            print('Metadata size :', len(metadata))
+            raw_data = (len(metadata)).to_bytes(4, byteorder='little',
+                                                    signed=False)
+            raw_data += metadata.encode(encoding='ascii')
+        else:
+            print('Metadata size :', 0)
+            raw_data = (0).to_bytes(4, byteorder='little', signed=False)
 
-    # print('\n\n\n')
-    # print("Type    :", type(request))
-    # print("COOKIES :", request.COOKIES)
-    # print("GET     :", request.GET)
-    # print("FILES   :", request.FILES)
-    # print("POST    :", request.POST)
-    # print('\n\n\n')
-
-    ping_data = b''
-    for chunk in request.FILES['ping_data']:
-        ping_data += chunk
-    # print(ping_data)
-
-    for socket in consumers.register.values():
-        socket.update(ping_data)
-
-    return HttpResponse(200)
-
-@csrf_protect
-def post_status_test(request):
-    if not request.method == 'POST':
-        return HttpResponse(400)
-
-    print('\n\n\n')
-    for key,value in request.META.items():
-        print(key, ":", value)
-    print('\n\n\n')
-
-    for key,value in request.FILES.items():
-        print(key, ":", type(value))
-        # value.open()
-        for chunk in value.chunks():
-            print(chunk)
-
-    print('\n\n\n')
-    print("Type    :", type(request))
-    print("COOKIES :", request.COOKIES)
-    print("GET     :", request.GET)
-    print("FILES   :", request.FILES)
-    print("POST    :", request.POST)
-    print('\n\n\n')
+        # metadata = request.POST['metadata']
+        # print("metadata type :", type(metadata))
+        # raw_data = b''
+        # print('raw_data type :', type(raw_data))
+        # print('encoded  type :', type(metadata.encode(encoding='ascii')))
+        # print('string  size :', len(metadata))
+        # print('encoded size :', len(metadata.encode(encoding='ascii')))
+        count = 0
+        for chunk in request.FILES['raw_data']:
+            raw_data += chunk
+            count += 1
+        print('Chunk count : ', count)
+        for socket in consumers.register.values():
+            socket.update(bytes_data=raw_data)
+    
+    # for socket in consumers.register.values():
+    #     # Not possible. The websocket will ignore bytes_data 
+    #     # if text_data is not None
+    #     socket.update(text_data=metadata, bytes_data=raw_data)
 
     return HttpResponse(200)
+
+

@@ -17,6 +17,8 @@ class PingConsumer(WebsocketConsumer):
         del register[id(self)]
         pass
 
-    def update(self, ping_data):
+    def update(self, text_data=None, bytes_data=None):
+        print("there", flush=True)
+        print("base_send", self.base_send, flush=True)
         # self.send(text_data=json.dumps({'message':'got ping'}))
-        self.send(bytes_data=ping_data)
+        self.send(text_data=text_data, bytes_data=bytes_data)

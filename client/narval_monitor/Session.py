@@ -45,11 +45,21 @@ class Session:
         print("Connection to",  self.rootUrl, "succesful.")
     
 
-    def post(self, url, data):
-        files = {'file' : ('data', data)}
-        r = self.session.post(self.rootUrl + url, files=files)
-        return r
-    
+    def post_message(self, url, metadata=None, raw_data=None):
+        # Here both the metadata and data of the message will be sent together
+        # to the server. However, in django, if metadata is present then
+        # raw_data will be ignored. (no easy fix possible)
+        post_data = {}
+        if metadata is not None:
+            # For json data to arrive in POST field in django, it must be
+            # encasulated in a regular form (= python dict which will be
+            # converted to an http form. Otherwise it will end up in the
+            # message body.
+            post_data['data'] = {'metadata' : json.dumps(metadata, ensure_ascii=True)}
+        if raw_data is not None:
+            # Sending raw (binary) via the HTTP FILES field.
+            post_data['files'] = {'raw_data' : ('data', raw_data)}
+        self.session.post(self.rootUrl + url, **post_data)
 
     def get(self, url):
         r = self.session.get(self.rootUrl + url)

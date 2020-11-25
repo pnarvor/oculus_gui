@@ -3,22 +3,29 @@
 import sys
 import rospy
 
-sys.path.append('../')
-from narval_monitor import PayloadSession
-
 import oculus_sonar.msg as oculus_msg
 
-session = PayloadSession('http://127.0.0.1:8000/payload_monitor')
+sys.path.append('../')
+from narval_monitor import Session
+from narval_monitor.sonar_conversions import *
 
-ping = 0
-def ping_callback(pingMsg):
-    global ping
-    print(pingMsg)
-    ping = pingMsg
+
+session = Session('http://127.0.0.1:8000/payload_monitor')
+
+# ping = 0
+# def ping_callback(pingMsg):
+#     global ping
+#     print(pingMsg)
+#     ping = pingMsg
+
+def ping_callback(msg):
+    metadata = from_OculusPing(msg)
+    # print(metadata)
+    session.post_message('/generic_update', metadata, msg.data)
 
 rospy.init_node('sonar_monitor', anonymous=True)
-# rospy.Subscriber('/ping_ping_update', oculus_msg.OculusPing, ping_callback)
-rospy.Subscriber('/ping', oculus_msg.OculusPing, session.post_sonar_ping)
+rospy.Subscriber('/ping', oculus_msg.OculusPing, ping_callback)
+# rospy.Subscriber('/ping', oculus_msg.OculusPing, session.post_sonar_ping)
 
 rospy.spin()
 
