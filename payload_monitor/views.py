@@ -12,6 +12,10 @@ def status(request):
 def array_tests(request):
     return render(request, 'array_tests.html')
 
+@ensure_csrf_cookie
+def webgl_test(request):
+    return render(request, 'webgl_test.html')
+
 @csrf_protect
 def generic_update(request):
     if not request.method == 'POST':
