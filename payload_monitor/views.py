@@ -8,6 +8,10 @@ from . import consumers
 def status(request):
     return render(request, 'status.html')
 
+@ensure_csrf_cookie
+def array_tests(request):
+    return render(request, 'array_tests.html')
+
 @csrf_protect
 def generic_update(request):
     if not request.method == 'POST':
@@ -23,12 +27,12 @@ def generic_update(request):
         # if binary data, sending metadata in the binary blob.
         if 'metadata' in request.POST:
             metadata = request.POST['metadata']
-            print('Metadata size :', len(metadata))
+            # print('Metadata size :', len(metadata))
             raw_data = (len(metadata)).to_bytes(4, byteorder='little',
                                                     signed=False)
             raw_data += metadata.encode(encoding='ascii')
         else:
-            print('Metadata size :', 0)
+            # print('Metadata size :', 0)
             raw_data = (0).to_bytes(4, byteorder='little', signed=False)
 
         # metadata = request.POST['metadata']
@@ -42,7 +46,7 @@ def generic_update(request):
         for chunk in request.FILES['raw_data']:
             raw_data += chunk
             count += 1
-        print('Chunk count : ', count)
+        # print('Chunk count : ', count)
         for socket in consumers.register.values():
             socket.update(bytes_data=raw_data)
     

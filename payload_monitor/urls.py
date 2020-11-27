@@ -8,4 +8,6 @@ urlpatterns = [
     path('status', views.status, name='status'),
 
     path('generic_update', views.generic_update, name='generic_update'),
+
+    path('array_tests', views.array_tests, name='array_tests'),
 ]
