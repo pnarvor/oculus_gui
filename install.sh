@@ -48,7 +48,6 @@ rm roboto
 
 # three
 wget -O payload_monitor/static/js/libs/three.js https://raw.githubusercontent.com/mrdoob/three.js/dev/build/three.js
-# wget -O payload_monitor/static/js/libs/OrbitControl.js https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/controls/OrbitControls.js
+wget -O payload_monitor/static/js/libs/OrbitControl.js https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/controls/OrbitControls.js
 
-
-
+# wget -O payload_monitor/static/js/libs/pixi.js https://pixijs.download/release/pixi.js
