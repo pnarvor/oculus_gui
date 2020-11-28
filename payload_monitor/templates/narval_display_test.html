@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block additional_body %}
+    <!-- <div id="status_div">Array test</div>-->
+    <canvas id="main_display" width="640" height="480">
+        DOES NOT SUPPORT CANVAS
+    </canvas>
+
+{% endblock %}
+
+{% block additional_scripts %}
+    <script id=vertex_shader  type="x-shader/x-vertex"
+            src="{% static 'glsl/tuto1.vert' %}"></script>
+    <script id=fragment_shader type="x-shader/x-fragment"
+            src="{% static 'glsl/tuto1.frag' %}"></script>
+
+    <script src="{% static 'js/nagl/maths/Matrix.js' %}"></script>
+
+    <script src="{% static 'js/nagl/ShaderUtils.js' %}"></script>
+    <script src="{% static 'js/nagl/Display.js' %}"></script>
+
+    <script src="{% static 'js/matrix_test.js' %}"></script>
+
+    <!--<script src="{% static 'js/nagl_test.js' %}"></script>-->
+{% endblock %}
+
+
+
+
+
+

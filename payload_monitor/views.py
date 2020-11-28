@@ -16,6 +16,10 @@ def array_tests(request):
 def webgl_test(request):
     return render(request, 'webgl_test.html')
 
+@ensure_csrf_cookie
+def narval_display_test(request):
+    return render(request, 'narval_display_test.html')
+
 @csrf_protect
 def generic_update(request):
     if not request.method == 'POST':

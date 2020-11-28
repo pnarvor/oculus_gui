@@ -12,4 +12,6 @@ urlpatterns = [
     path('array_tests', views.array_tests, name='array_tests'),
 
     path('webgl_test', views.webgl_test, name='webgl_test'),
+
+    path('narval_display_test', views.narval_display_test, name='narval_display_test'),
 ]
