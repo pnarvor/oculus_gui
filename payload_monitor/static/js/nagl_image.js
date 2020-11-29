@@ -8,10 +8,9 @@ $(document).ready(function() {
             .resize(window.innerWidth, window.innerHeight);
     };
     window.onresize();
-
-    let renderer = new Renderer(display.gl);
-    renderer.view.projection.set_at(0,0,0.5);
-    renderer.view.projection.set_at(1,1,0.5);
+    
+    let view = new ImageView();
+    let renderer = new Renderer(display.gl, view);
 
     display.add_renderer(renderer);
      

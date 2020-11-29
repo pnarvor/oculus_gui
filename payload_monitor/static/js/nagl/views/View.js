@@ -2,12 +2,12 @@
 class View
 {
     constructor(projection=Matrix.Identity(4),
-                screen = {width : 1.0, height : 1.0})
+                screen = new Shape(1.0,1.0))
     {
         if(!projection.is_square(4)) {
             throw Error("View() : projection must be a square 4 matrix");
         }
-        this.screen     = screen;
+        this.screen     = new Shape(screen.width, screen.height);
         this.projection = projection.force_column_major();
     }
 
@@ -15,13 +15,8 @@ class View
         //to be reimplemented in subclasses.
     }
 
-    set_screen_shape(screen) {
-        if(typeof(screen.width)  == "undefined" ||
-           typeof(screen.height) == "undefined") {
-            throw Error("View.set_screen_shape : screen parameter " +
-                        "must have both a width and a height argument");
-        }
-        this.screen = screen;
+    set_screen_shape(shape) {
+        this.screen = shape;
         this.update_projection();
     }
     

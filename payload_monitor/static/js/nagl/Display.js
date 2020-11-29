@@ -19,8 +19,7 @@ class Display
     }
 
     screen_shape() {
-        return {width  : this.canvas.width,
-                height : this.canvas.height};
+        return new Shape(this.canvas.width, this.canvas.height);
     }
 
     add_view(view) {
