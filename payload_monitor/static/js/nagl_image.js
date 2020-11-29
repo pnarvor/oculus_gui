@@ -54,8 +54,8 @@ $(document).ready(function() {
     let imageRenderer = new ImageRenderer(display.gl);
     let shape = new Shape(64,64);
     //imageRenderer.set_rgb_image(shape, create_rgb_image(shape));
-    //imageRenderer.set_image(shape, create_image(shape));
-    imageRenderer.set_image(shape, create_image_8bits(shape));
+    imageRenderer.set_image(shape, create_image(shape));
+    //imageRenderer.set_image(shape, create_image_8bits(shape));
 
     display.add_renderer(renderer);
     display.add_renderer(imageRenderer);
