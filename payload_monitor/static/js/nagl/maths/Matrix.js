@@ -15,6 +15,28 @@ class Matrix
             data[i] = i;
         return new Matrix(data, nRows, nCols);
     }
+    
+    static Zeros(nRows, nCols) {
+        if(nRows == undefined) {
+            throw Error("Matrix.constructor : you must give at least one dimension size.");
+        }
+        if(nCols == undefined) {
+            nCols = nRows;
+        }
+        let data = new Float32Array(nRows*nCols);
+        for(let i in data) {
+            data[i] = 0.0;
+        }
+        return new Matrix(data, nRows, nCols);
+    }
+
+    static Identity(nRows, nCols) {
+        let res = Matrix.Zeros(nRows, nCols);
+        for(let i = 0; i < Math.min(res.rows, res.cols); i++) {
+            res.set_at(i,i,1.0);
+        }
+        return res;
+    }
 
     static New(nRows=undefined, nCols=undefined) {
         if(nRows == undefined) {
@@ -143,12 +165,21 @@ class Matrix
         return res;
     }
 
-    force_colum_major() {
+    force_column_major() {
         if(this.rStride == 1 && this.cStride == this.rows) {
             return this;
         }
         else {
             return this.deepcopy();
+        }
+    }
+
+    is_square(size=undefined) {
+        if(size == undefined) {
+            return this.rows == this.cols;
+        }
+        else {
+            return this.rows == size && this.cols == size;
         }
     }
 };

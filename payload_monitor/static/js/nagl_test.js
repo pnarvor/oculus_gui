@@ -1,24 +1,20 @@
 
 $(document).ready(function() {
     let canvas   = $("#main_display")[0];
-    let renderer = new Display(canvas);
-    canvas.renderer = renderer;
+    let display = new Display(canvas);
+    canvas.naglContext = display;
+    //window.onresize = function() {
+    //    $("#main_display")[0].naglContext
+    //        .resize(window.innerWidth, window.innerHeight);
+    //};
 
-    let mat0 = MatrixView.Linspace(4);
-    mat0.print();
-    mat0.col(1).print();
-    mat0.row(1).print();
+    let renderer = new Renderer(display.gl);
 
-    mat0.transposed().print();
-    mat0.print();
-    mat0.transpose().print();
-    mat0.print();
-
-    console.log(mat0.col(1).dot(mat0.row(1)));
-    
+    display.add_renderer(renderer);
+     
     animate = function(currentTime) {
-        $("#main_display")[0].renderer.draw();
+        $("#main_display")[0].naglContext.draw();
         window.requestAnimationFrame(animate);
     }
-    //animate();
+    animate();
 });

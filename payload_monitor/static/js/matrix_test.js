@@ -16,6 +16,8 @@ $(document).ready(function() {
 
     console.log(mat0.col(1).dot(mat0.row(1)));
     mat0.multiply(mat0).print();
+
+    Matrix.Identity(3,4).print();
     
     animate = function(currentTime) {
         $("#main_display")[0].renderer.draw();
