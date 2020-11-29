@@ -24,7 +24,7 @@ class Shader
 {
     constructor(gl, source, type)
     {
-        //this.source = source;
+        this.source = source;
         this.type   = type;
         this.shader = gl.createShader(type);
 
@@ -52,6 +52,9 @@ class Program
         gl.linkProgram(this.program);
 
         if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+            for(const shader of shaders) {
+                console.log(shader.source);
+            }
             console.error("Error linking shader program: "
                           + gl.getProgramInfoLog(this.program));
         }

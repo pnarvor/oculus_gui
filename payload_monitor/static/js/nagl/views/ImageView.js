@@ -16,4 +16,9 @@ class ImageView extends View {
             this.projection.set_at(1,1, metaRatio);
         }
     }
+
+    set_image_shape(shape) {
+        this.imageShape = shape;
+        this.update_projection();
+    }
 };

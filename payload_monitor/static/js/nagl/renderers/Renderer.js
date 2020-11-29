@@ -27,8 +27,7 @@ class Renderer
     void main()
     {
         outColor = vec4(c, 1.0f);
-    }
-    `;
+    }`;
 
     constructor(gl, view = new View(), 
                 vertexShader = Renderer.defaultVertexShader,
