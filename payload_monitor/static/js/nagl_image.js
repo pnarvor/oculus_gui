@@ -1,5 +1,5 @@
 
-create_image = function(shape) {
+create_rgb_image = function(shape) {
     let data = new Float32Array(4 * shape.size());
     let idx = 0;
     for(let h = 0; h < shape.height; h++) {
@@ -14,7 +14,29 @@ create_image = function(shape) {
     return data;
 };
 
+create_image = function(shape) {
+    let data = new Float32Array(shape.size());
+    let idx = 0;
+    for(let h = 0; h < shape.height; h++) {
+        for(let w = 0; w < shape.width; w++) {
+            data[idx] = ((w+h)   & 0x1);
+            idx += 1;
+        }
+    }
+    return data;
+};
 
+create_image_8bits = function(shape) {
+    let data = new Uint8Array(shape.size());
+    let idx = 0;
+    for(let h = 0; h < shape.height; h++) {
+        for(let w = 0; w < shape.width; w++) {
+            data[idx] = 255*((w+h)   & 0x1);
+            idx += 1;
+        }
+    }
+    return data;
+};
 
 $(document).ready(function() {
     let canvas   = $("#main_display")[0];
@@ -30,8 +52,10 @@ $(document).ready(function() {
     let renderer = new Renderer(display.gl, view);
     
     let imageRenderer = new ImageRenderer(display.gl);
-    let shape = new Shape(2,2);
-    imageRenderer.set_rgb_image(shape, create_image(shape));
+    let shape = new Shape(64,64);
+    //imageRenderer.set_rgb_image(shape, create_rgb_image(shape));
+    //imageRenderer.set_image(shape, create_image(shape));
+    imageRenderer.set_image(shape, create_image_8bits(shape));
 
     display.add_renderer(renderer);
     display.add_renderer(imageRenderer);
