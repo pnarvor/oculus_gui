@@ -53,7 +53,6 @@ class ImageRenderer extends Renderer
         super(gl, new ImageView(),
               ImageRenderer.defaultVertexShader,
               ImageRenderer.defaultFragmentShader);
-        this.gl = gl;
 
         // cannot pre-allocate data without giving a full buffer
         this.texture  = this.gl.createTexture();

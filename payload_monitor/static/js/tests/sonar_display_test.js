@@ -5,21 +5,34 @@ class SonarDisplay extends Display
     {
         super(canvas);
 
-        this.pingRenderer = new ImageRenderer(this.gl);
+        this.pingRenderer = new SonarRenderer(this.gl);
         this.add_renderer(this.pingRenderer);
 
         this.pingListener = new DataListener();
         this.pingListener.callbacks.push(this.ping_callback.bind(this));
+
+        this.busy = false;
     }
 
     async ping_callback(content)
     {
-        let metadata = JSON.parse(content.content.metadata);
-        let data = new Uint8Array(await content.fetch_cached_data());
+        // does this "mutex" really is secure ? (this function is
+        // asynchronously called by the callback of a websocket.
+        if(this.busy) {
+            console.log("Busy : ignoring data");
+            return;
+        }
+        this.busy = true;
+        
+        try {
+            let metadata = JSON.parse(content.content.metadata);
+            let data = new Uint8Array(await content.fetch_cached_data());
 
-        this.pingRenderer.set_image(new Shape(metadata.nBeams, metadata.nRanges),
-                                    data.subarray(metadata.imageOffset));
-
+            this.pingRenderer.set_ping_data(metadata, data.subarray(metadata.imageOffset));
+        }
+        finally {
+            this.busy = false;
+        }
         this.draw();
     }
 };
