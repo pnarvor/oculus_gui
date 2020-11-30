@@ -1,8 +1,13 @@
+import json
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 
 from . import consumers
+
+from .cache import Cache
+cache = Cache()
 
 @ensure_csrf_cookie
 def status(request):
@@ -21,48 +26,42 @@ def narval_display_test(request):
     return render(request, 'narval_display_test.html')
 
 @csrf_protect
-def generic_update(request):
+def post_data(request):
     if not request.method == 'POST':
         return HttpResponse(400)
     
-    if 'raw_data' not in request.FILES and 'metadata' in request.POST:
-        # if no binary data, sending metadata data as "text"
-        metadata = request.POST['metadata']
-        # Have to do it this way for reasons explained below
-        for socket in consumers.register.values():
-            socket.update(text_data=metadata)
-    elif 'raw_data' in request.FILES:
-        # if binary data, sending metadata in the binary blob.
-        if 'metadata' in request.POST:
-            metadata = request.POST['metadata']
-            # print('Metadata size :', len(metadata))
-            raw_data = (len(metadata)).to_bytes(4, byteorder='little',
-                                                    signed=False)
-            raw_data += metadata.encode(encoding='ascii')
-        else:
-            # print('Metadata size :', 0)
-            raw_data = (0).to_bytes(4, byteorder='little', signed=False)
-
-        # metadata = request.POST['metadata']
-        # print("metadata type :", type(metadata))
-        # raw_data = b''
-        # print('raw_data type :', type(raw_data))
-        # print('encoded  type :', type(metadata.encode(encoding='ascii')))
-        # print('string  size :', len(metadata))
-        # print('encoded size :', len(metadata.encode(encoding='ascii')))
+    msg = {'type' : 'empty', 'metadata' : 'None'}
+    if 'metadata' in request.POST:
+        msg['metadata'] = request.POST['metadata']
+        msg['type']     = 'form_data'
+    
+    dataUuid = None
+    if 'raw_data' in request.FILES:
+        raw_data = b'';
         count = 0
         for chunk in request.FILES['raw_data']:
             raw_data += chunk
             count += 1
-        # print('Chunk count : ', count)
-        for socket in consumers.register.values():
-            socket.update(bytes_data=raw_data)
-    
-    # for socket in consumers.register.values():
-    #     # Not possible. The websocket will ignore bytes_data 
-    #     # if text_data is not None
-    #     socket.update(text_data=metadata, bytes_data=raw_data)
+        msg['type'] = 'cached_data'
+        dataUuid = cache.insert(raw_data)
+        msg['data_uuid'] = dataUuid
 
-    return HttpResponse(200)
+    for socket in consumers.register.values():
+        socket.update(text_data=json.dumps(msg))
+
+    response = HttpResponse(200)
+    if dataUuid is not None:
+        response['data_uuid'] = dataUuid
+    return response
+
+@csrf_protect
+def get_cached_data(request, dataUuid):
+    if not request.method == 'GET':
+        return HttpResponse(400)
+    data = cache.get(dataUuid)
+    if data is None:
+        return HttpResponse(404)
+    return HttpResponse(data)
+
 
 

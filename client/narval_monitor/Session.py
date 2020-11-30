@@ -59,7 +59,7 @@ class Session:
         if raw_data is not None:
             # Sending raw (binary) via the HTTP FILES field.
             post_data['files'] = {'raw_data' : ('data', raw_data)}
-        self.session.post(self.rootUrl + url, **post_data)
+        return self.session.post(self.rootUrl + url, **post_data)
 
     def get(self, url):
         r = self.session.get(self.rootUrl + url)

@@ -1,5 +1,7 @@
 #! /usr/bin/python
 
+from __future__ import print_function
+
 import sys
 import rospy
 
@@ -12,20 +14,15 @@ from narval_monitor.sonar_conversions import *
 
 session = Session('http://127.0.0.1:8000/payload_monitor')
 
-# ping = 0
-# def ping_callback(pingMsg):
-#     global ping
-#     print(pingMsg)
-#     ping = pingMsg
-
 def ping_callback(msg):
+
     metadata = from_OculusPing(msg)
-    # print(metadata)
-    session.post_message('/generic_update', metadata, msg.data)
+    response = session.post_message('/post_data', metadata, msg.data)
+    print(response)
+    print(response.headers)
 
 rospy.init_node('sonar_monitor', anonymous=True)
 rospy.Subscriber('/ping', oculus_msg.OculusPing, ping_callback)
-# rospy.Subscriber('/ping', oculus_msg.OculusPing, session.post_sonar_ping)
 
 rospy.spin()
 
