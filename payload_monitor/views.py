@@ -28,7 +28,7 @@ def narval_display_test(request):
 @csrf_protect
 def post_data(request):
     if not request.method == 'POST':
-        return HttpResponse(400)
+        return HttpResponse(status=400)
     
     msg = {'type' : 'empty', 'metadata' : 'None'}
     if 'metadata' in request.POST:
@@ -44,12 +44,13 @@ def post_data(request):
             count += 1
         msg['type'] = 'cached_data'
         dataUuid = cache.insert(raw_data)
-        msg['data_uuid'] = dataUuid
+        msg['data_uuid']         = dataUuid
+        msg['cache_request_url'] = '/payload_monitor/get_cached_data/'
 
     for socket in consumers.register.values():
         socket.update(text_data=json.dumps(msg))
 
-    response = HttpResponse(200)
+    response = HttpResponse(status=200)
     if dataUuid is not None:
         response['data_uuid'] = dataUuid
     return response
@@ -57,11 +58,11 @@ def post_data(request):
 @csrf_protect
 def get_cached_data(request, dataUuid):
     if not request.method == 'GET':
-        return HttpResponse(400)
+        return HttpResponse(status=400)
     data = cache.get(dataUuid)
     if data is None:
-        return HttpResponse(404)
-    return HttpResponse(data)
+        return HttpResponse(status=404)
+    return HttpResponse(content=data, status=200)
 
 
 
