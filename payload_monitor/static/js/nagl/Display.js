@@ -4,6 +4,8 @@ class Display
 {
     constructor(canvas)
     {
+        canvas.naglContext = this; // canvas will hold the reference for this for us
+
         this.canvas = canvas;
         this.gl     = this.canvas.getContext("webgl2", {antialias : false});
 

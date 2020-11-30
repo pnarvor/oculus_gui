@@ -39,9 +39,7 @@ create_image_8bits = function(shape) {
 };
 
 $(document).ready(function() {
-    let canvas   = $("#main_display")[0];
-    let display = new Display(canvas);
-    canvas.naglContext = display;
+    let display = new Display($("#main_display")[0]);
     window.onresize = function() {
         $("#main_display")[0].naglContext
             .resize(window.innerWidth, window.innerHeight);
