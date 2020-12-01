@@ -28,6 +28,7 @@ class DataUpdater(WebsocketConsumer):
         super().__init__(*args, **kwargs)
 
     def connect(self):
+        print("url argument", self.scope["url_route"]["kwargs"]["argument"])
         self.accept()
         register[id(self)] = self
 

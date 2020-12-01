@@ -8,7 +8,8 @@ class SonarDisplay extends Display
         this.pingRenderer = new SonarRenderer(this.gl);
         this.add_renderer(this.pingRenderer);
 
-        this.pingListener = new DataListener();
+        //this.pingListener = new DataListener();
+        this.pingListener = new DataListener('/ws/subscribe/test/');
         this.pingListener.callbacks.push(this.ping_callback.bind(this));
 
         this.busy = false;
