@@ -28,7 +28,7 @@ class DataUpdater(WebsocketConsumer):
         super().__init__(*args, **kwargs)
 
     def connect(self):
-        print("url argument", self.scope["url_route"]["kwargs"]["argument"])
+        # print("url argument", self.scope["url_route"]["kwargs"]["argument"])
         self.accept()
         register[id(self)] = self
 
@@ -85,3 +85,4 @@ class WebSocketTest(WebsocketConsumer):
 
     # def update(self, text_data=None, bytes_data=None):
     #     self.send(text_data=text_data, bytes_data=bytes_data)
+
