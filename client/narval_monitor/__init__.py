@@ -1,2 +1,2 @@
-from .Session       import Session
-from PayloadSession import PayloadSession
+from .Session           import Session
+from .ReconfigureParser import ReconfigureParser
