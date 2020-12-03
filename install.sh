@@ -32,7 +32,7 @@ if [ ! -d "payload_monitor/static/css/libs/icons" ]; then
     mkdir -p payload_monitor/static/css/libs/icons
 fi
 wget -O payload_monitor/static/css/libs/material-icons.css https://fonts.googleapis.com/icon?family=Material+Icons
-wget -O payload_monitor/static/css/libs/icons/MaterialIcons-Regular.ttf 'https://github.com/google/material-design-icons/blob/master/font/MaterialIcons-Regular.ttf'
+wget -O payload_monitor/static/css/libs/icons/MaterialIcons-Regular.ttf 'https://github.com/google/material-design-icons/blob/master/font/MaterialIcons-Regular.ttf?raw=true'
 sed  -i 's/src.*/src:url("icons\/MaterialIcons-Regular.ttf") format("truetype");/g' payload_monitor/static/css/libs/material-icons.css
 
 # Roboto font
