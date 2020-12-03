@@ -26,7 +26,7 @@ class ReconfigureClient
             console.log(data);
         }
     }
-    
+
     on_config(msg) {
     }
 

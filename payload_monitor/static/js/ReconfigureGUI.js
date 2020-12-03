@@ -10,9 +10,19 @@ class ReconfigureGUI extends ReconfigureClient
 
         this.elements = {};
         this.configRequest = {};
+        this.configCallbacks = {};
 
         // all display will be put inside this
-        this.mainDiv  = document.createElement("div");
+        this.mainDiv       = document.createElement("div");
+        this.configDiv     = document.createElement("div");
+        this.requestButton = document.createElement("a");
+        this.requestButton.classList.add("btn", "waves-effect", "waves-light");
+        this.requestButton.innerHTML = "Update Configuration";
+        this.requestButton.onclick = this.request_config.bind(this);
+
+        this.mainDiv.appendChild(this.configDiv);
+        this.mainDiv.appendChild(this.requestButton);
+
         this.parentElement.appendChild(this.mainDiv);
     }
 
@@ -20,10 +30,23 @@ class ReconfigureGUI extends ReconfigureClient
         this.configRequest[optionName] = value;
         console.log(this.configRequest);
     }
+
+    request_config() {
+        if(jQuery.isEmptyObject(this.configRequest)) {
+            console.log("Empty request");
+            return;
+        }
+        this.websocket.send(JSON.stringify(
+            {type    : "config_request",
+             payload : this.configRequest}));
+    }
     
     on_config(config) {
-        console.log("Got config");
-        console.log(config);
+        for(let name in config) {
+            if(name in this.configCallbacks) {
+                this.configCallbacks[name](config[name]);
+            }
+        }
     }
 
     on_description(configDesc) {
@@ -35,8 +58,8 @@ class ReconfigureGUI extends ReconfigureClient
 
     generate_gui(configDesc) {
         this.elements = {}
-        while(this.mainDiv.firstChild) {
-            this.mainDiv.removeChild(this.mainDiv.firstChild);
+        while(this.configDiv.firstChild) {
+            this.configDiv.removeChild(this.configDiv.firstChild);
         }
         
         let form = document.createElement("form");
@@ -47,13 +70,11 @@ class ReconfigureGUI extends ReconfigureClient
             this.elements[newInput.name] = newInput;
             form.appendChild(newInput.dom);
         }
-        this.mainDiv.appendChild(form);
-        
+        this.configDiv.appendChild(form);
+
         $(".tooltipped").tooltip();
         $("select").formSelect();
         M.Range.init($("[type|=range]"));
-
-        //this.mainDiv.innerHTML = "<li><a class=\"subheader\">Subheader</a></li>";
     }
 
     create_input(inputDesc) {
@@ -104,8 +125,15 @@ class ReconfigureGUI extends ReconfigureClient
         select.target = this;
         select.optionName = inputDesc.name;
         select.onchange = function() {
-            this.target.option_changed(this.optionName, this.value);
+            this.target.option_changed(this.optionName, Number(this.value));
         }
+
+        function update(value) {
+            this.value = value.toString();
+            M.FormSelect.init(this);
+        }
+        update = update.bind(select);
+        this.configCallbacks[inputDesc.name] = update;
 
         let dom   = document.createElement("p");
         //let dom   = document.createElement("li");
@@ -139,6 +167,12 @@ class ReconfigureGUI extends ReconfigureClient
             this.target.option_changed(this.optionName, this.checked);
         }
 
+        function update(value) {
+            this.checked = value;
+        }
+        update = update.bind(checkBox);
+        this.configCallbacks[inputDesc.name] = update;
+
         label.appendChild(checkBox);
         label.appendChild(title);
 
@@ -169,17 +203,18 @@ class ReconfigureGUI extends ReconfigureClient
         input.target = this;
         input.optionName = inputDesc.name;
         input.onchange = function() {
-            this.target.option_changed(this.optionName, this.value);
+            this.target.option_changed(this.optionName, Number(this.value));
         }
+
+        function update(value) {
+            this.value = value;
+        }
+        update = update.bind(input);
+        this.configCallbacks[inputDesc.name] = update;
 
         dom.appendChild(title);
         dom.appendChild(input);
         dom.classList.add("range-field");
-
-        //let range = document.createElement("p");
-        //range.classList.add("range-field");
-        //range.appendChild(input);
-        //dom.appendChild(range);
 
         return dom;
     }

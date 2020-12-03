@@ -54,3 +54,7 @@ class ReconfigureClient(WebsocketConsumer):
 
     def update(self, config):
         self.send(text_data=config)
+
+    def receive(self, text_data=None, bytes_data=None, close=False):
+        bridges[self.nodeName].send(
+            text_data=text_data, bytes_data=bytes_data, close=close)
