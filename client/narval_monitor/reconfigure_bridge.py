@@ -37,6 +37,9 @@ class ReconfigureBridgeProtocol(WebSocketClientProtocol):
     def onMessage(self, msg, binary):
         print("Got message")
         print(msg)
+        data = json.loads(msg)
+        if data['type'] == 'config_request':
+            self.reconfClient.update_configuration(data['payload'])
 
     def onClose(self, wasClean, code, reason):
         print("Closing", wasClean, code, reason)
