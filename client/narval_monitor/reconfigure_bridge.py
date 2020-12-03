@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import sys
+import ast
 sys.path.append('../')
 import json
 
@@ -26,6 +27,9 @@ class ReconfigureBridgeProtocol(WebSocketClientProtocol):
 
     def onOpen(self):
         self.description = self.reconfClient.get_parameter_descriptions()
+        for param in self.description:
+            if len(param['edit_method']) > 0:
+                param['edit_method'] = ast.literal_eval(param['edit_method']);
         self.sendMessage(json.dumps({'type'    : 'description',
                                      'payload' : self.description}))
         print("Connection successful")

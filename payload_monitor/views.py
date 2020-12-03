@@ -63,6 +63,8 @@ def post_data(request):
 def get_cached_data(request, dataUuid):
     if not request.method == 'GET':
         return HttpResponse(status=400)
+
+    print("Getting data :", dataUuid)
     data = cache.get(dataUuid)
     if data is None:
         return HttpResponse(status=404)

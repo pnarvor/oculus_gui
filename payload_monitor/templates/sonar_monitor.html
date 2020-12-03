@@ -9,13 +9,16 @@
     </canvas>
     </div>
 
-    <ul id="slide-out" class="sidenav sidenav-fixed">
+    <div id="reconf_container">
+    <!-- <ul id="slide-out" class="sidenav sidenav-fixed">
         <li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
         <li><a href="#!">Second Link</a></li>
         <li><div class="divider"></div></li>
         <li><a class="subheader">Subheader</a></li>
         <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
-    </ul>
+    </ul>-->
+    </div>
+
 
 {% endblock %}
 
@@ -40,6 +43,9 @@
     <script src="{% static 'js/DataListener.js' %}"></script>
     <script src="{% static 'js/SonarRenderer.js' %}"></script>
     <script src="{% static 'js/SonarDisplay.js' %}"></script>
+
+    <script src="{% static 'js/ReconfigureClient.js' %}"></script>
+    <script src="{% static 'js/ReconfigureGUI.js' %}"></script>
 
     <script src="{% static 'js/sonar_monitor.js' %}"></script>
 {% endblock %}

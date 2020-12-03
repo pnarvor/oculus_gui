@@ -20,7 +20,7 @@ class SonarDisplay extends Display
         // does this "mutex" really is secure ? (this function is
         // asynchronously called by the callback of a websocket.
         if(this.busy) {
-            console.log("Busy : ignoring data");
+            //console.log("Busy : ignoring data");
             return;
         }
         this.busy = true;

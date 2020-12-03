@@ -6,6 +6,8 @@ class DataInfo
 
     async fetch_cached_data()
     {
+        // Two requests are sent to the server, the data is transfered twice.
+        // (investigate)
         const content = this.content
         return new Promise(function(resolve, reject) {
             if(content.type != 'cached_data') {
