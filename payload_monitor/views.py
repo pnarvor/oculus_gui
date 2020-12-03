@@ -14,6 +14,10 @@ def status(request):
     return render(request, 'status.html')
 
 @ensure_csrf_cookie
+def render_page(request, page):
+    return render(request, page + '.html')
+
+@ensure_csrf_cookie
 def array_tests(request):
     return render(request, 'array_tests.html')
 
