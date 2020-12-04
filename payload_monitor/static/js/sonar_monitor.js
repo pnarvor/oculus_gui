@@ -9,7 +9,7 @@ $(document).ready(function() {
    $("#reconf_container")[0].appendChild(sideNav);
    $('.sidenav').sidenav({edge:'right'});
 
-    let control = new ReconfigureGUI(sideNav);
+    let control = new ReconfigureGUI(sideNav, "oculus_sonar");
     //window.onresize = function() {
     //    $("#main_display")[0].naglContext
     //        .resize(window.innerWidth, window.innerHeight);
