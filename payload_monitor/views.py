@@ -30,11 +30,11 @@ def narval_display_test(request):
     return render(request, 'narval_display_test.html')
 
 @csrf_protect
-def post_data(request):
+def post_data(request, topicName):
     if not request.method == 'POST':
         return HttpResponse(status=400)
     
-    msg = {'type' : 'empty', 'metadata' : 'None'}
+    msg = {'topic' : topicName, 'type' : 'empty', 'metadata' : 'None'}
     if 'metadata' in request.POST:
         msg['metadata'] = request.POST['metadata']
         msg['type']     = 'form_data'
