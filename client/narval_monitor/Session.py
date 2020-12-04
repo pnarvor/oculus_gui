@@ -3,6 +3,8 @@
 from __future__ import print_function
 
 import requests
+import time
+from requests.exceptions import ConnectionError
 import json
 
 class Session:
@@ -16,22 +18,6 @@ class Session:
 
     def print_response(r, verbose=True):
         print('status code  :',   r.status_code)
-        print('content type :',   r.headers['content-type'])
-        print('encoding     :',   r.encoding)
-        if verbose:
-            print('text         :\n', r.text, end='\n\n')
-            if 'json' in r.headers['content-type']:
-                print('json         :\n', r.json(), end='\n\n')
-
-    def __init__(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
-        self.connect(rootUrl, loginUrl)
-
-
-    def connect(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
-        self.rootUrl  = rootUrl
-        self.loginUrl = loginUrl
-        self.session  = requests.session()
-        
         # Getting csrf token
         if self.loginUrl is None:
             self.loginUrl = self.rootUrl
@@ -43,9 +29,53 @@ class Session:
                                + ". Is the server running ?")
         self.session.headers.update({'X-CSRFToken': self.csrfToken})
         print("Connection to",  self.rootUrl, "succesful.")
-    
+        print('content type :',   r.headers['content-type'])
+        print('encoding     :',   r.encoding)
+        if verbose:
+            print('text         :\n', r.text, end='\n\n')
+            if 'json' in r.headers['content-type']:
+                print('json         :\n', r.json(), end='\n\n')
 
-    def post_message(self, url, metadata=None, raw_data=None):
+    def __init__(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
+        self.connected = False
+        self.connect(rootUrl, loginUrl)
+
+    def connect(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
+        self.rootUrl  = rootUrl
+        self.loginUrl = loginUrl
+        self.session  = requests.session()
+        self.connectionErrorCount = 0
+        self.try_connection()
+    
+    def try_connection(self, maxAttempts = -1):
+        # Getting csrf token
+        if self.loginUrl is None:
+            self.loginUrl = self.rootUrl
+        attempts = 0
+        self.connected = False
+        while 1:
+            try:
+                self.session.get(self.loginUrl, timeout=3.0)
+                self.csrfToken = self.session.cookies['csrftoken']
+                break
+            except KeyError:
+                print("Could not get csrf token from "+self.loginUrl+
+                      ". Is the server running ?")
+                time.sleep(0.5)
+            except ConnectionError as e:
+                print("ConnectionError (attemp "+str(attempts)+"),  retrying... ", e)
+                time.sleep(0.5)
+            finally:
+                attempts += 1
+                if maxAttempts > 0 and attempts >= maxAttempts:
+                    raise ConnectionError("Connection Failure (max attemps reached)")
+        self.connected = True
+        self.session.headers.update({'X-CSRFToken': self.csrfToken})
+        print("Connection to",  self.rootUrl, "succesful.")
+
+    def post_message(self, url, metadata=None, raw_data=None, timeout=5.0):
+        if not self.connected:
+            return
         # Here both the metadata and data of the message will be sent together
         # to the server. However, in django, if metadata is present then
         # raw_data will be ignored. (no easy fix possible)
@@ -59,9 +89,11 @@ class Session:
         if raw_data is not None:
             # Sending raw (binary) via the HTTP FILES field.
             post_data['files'] = {'raw_data' : ('data', raw_data)}
-        return self.session.post(self.rootUrl + url, **post_data)
+        return self.session.post(self.rootUrl + url, timeout=timeout, **post_data)
 
     def get(self, url):
+        if not self.connected:
+            return
         r = self.session.get(self.rootUrl + url)
         return r
 

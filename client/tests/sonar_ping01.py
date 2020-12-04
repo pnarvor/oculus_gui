@@ -15,13 +15,14 @@ from narval_monitor.sonar_conversions import *
 session = Session('http://127.0.0.1:8000/payload_monitor')
 
 def ping_callback(msg):
-
+    global session
     metadata = from_OculusPing(msg)
     response = session.post_message('/post_data', metadata, msg.data)
-    print(response)
-    print(response.headers)
+    if response is not None:
+        print(response)
+        print(response.headers)
 
-rospy.init_node('sonar_monitor', anonymous=True)
+rospy.init_node('sonar_monitor', anonymous=True, disable_signals=True)
 rospy.Subscriber('/ping', oculus_msg.OculusPing, ping_callback)
 
 rospy.spin()
