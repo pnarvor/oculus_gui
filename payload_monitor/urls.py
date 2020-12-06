@@ -15,6 +15,8 @@ urlpatterns = [
 
     path('post_data/<str:topicName>', views.post_data, name='post_data'),
     path('get_cached_data/<str:dataUuid>', views.get_cached_data, name='get_cached_data'),
+
+    path('generic_post', views.generic_post, name='generic_post'),
 ]
 
 
