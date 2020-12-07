@@ -14,8 +14,11 @@ session = HttpSession(reactor, '127.0.0.1', rootUrl='payload_monitor/')
 print(session)
 session.connect()
 
+delay = 0.1
 def new_request():
-    d = session.request('POST', 'generic_post')
+    # d = session.request('POST', 'generic_post')
+    d = session.post('generic_post', data={'data' : 'hello'},
+                     files={'raw_data' : ('data', b'here are raw data')})
     d.addCallback(test_callback)
     d.addErrback(test_errback)
 
@@ -34,13 +37,13 @@ def test_callback(response):
     finished = Deferred()
     response.deliverBody(PrintBody(finished))
 
-    reactor.callLater(1.0, new_request)
+    reactor.callLater(delay, new_request)
     return finished
 
 def test_errback(failure):
     # print("Got error")
     print("Got error :", failure)
-    reactor.callLater(1.0, new_request)
+    reactor.callLater(delay, new_request)
 reactor.callLater(0.0, new_request)
 
 reactor.run()

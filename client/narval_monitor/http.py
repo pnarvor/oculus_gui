@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import time
+import json
 
 from pprint import pformat
 
@@ -10,6 +11,8 @@ from twisted.web.client import Agent, HTTPConnectionPool, RedirectAgent, CookieA
 from twisted.web.http_headers import Headers
 from twisted.python import log, compat
 from twisted.python.url import URL
+
+from treq.client import HTTPClient
 
 class IgnoreBody(Protocol):
     def __init__(self, deferred):
@@ -31,6 +34,7 @@ class PrintBody(Protocol):
     def connectionLost(self, reason):
         self.deferred.callback(None)
 
+
 class HttpSession:
     response = 0
     def __init__(self, reactor, host, port=8000, rootUrl=None, loginUrl=None):
@@ -40,19 +44,23 @@ class HttpSession:
 
         self.rootUrl = URL(scheme=u'http', host=unicode(self.host),
                            port=self.port).asURI()
-        if rootUrl is not None:
-            self.rootUrl = self.rootUrl.click(unicode(rootUrl)).asURI()
         # This url is where to fetch the csrf token
         if loginUrl is None:
             self.loginUrl = self.rootUrl
         else:
-            self.loginUrl = self.rootUrl.click(unicode(loginUrl)).asURI()
+            # self.loginUrl = self.rootUrl.child(unicode(loginUrl)).asURI()
+            self.loginUrl = self.child_path(loginUrl)
+        # all next request will use self.rootUrl as prefix
+        if rootUrl is not None:
+            # self.rootUrl = self.rootUrl.child(unicode(rootUrl)).asURI()
+            self.rootUrl = self.child_path(rootUrl)
 
         # Client related code
         self.pool      = HTTPConnectionPool(self.reactor)
         self.cookieJar = compat.cookielib.CookieJar()
         self.agent     = CookieAgent(RedirectAgent(Agent(self.reactor, pool=self.pool)),
                                      self.cookieJar)
+        self.session   = HTTPClient(self.agent)
         self.csrf = None
 
         self.connected  = False
@@ -64,6 +72,12 @@ class HttpSession:
         return 'HttpSession :' \
                + '\n- host  : ' + self.rootUrl.asText() \
                + '\n- login : ' + self.loginUrl.asText() 
+    
+    def child_path(self, path):
+        res = self.rootUrl
+        for p in [unicode(p) for p in path.split('/') if len(p) > 0]:
+            res = res.child(p)
+        return res
 
     def error_counter(self, failure):
         self.errorCount += 1
@@ -131,8 +145,7 @@ class HttpSession:
         return None # end of error chain
 
     def request(self, method, uri, headers=None, bodyProducer=None):
-        uri = bytes(self.rootUrl.click(unicode(uri)).asText())
-        print('New request', uri)
+        uri = bytes(self.child_path(uri).asText())
         if headers is None:
             headers = Headers()
         headers.addRawHeader('X-CSRFtoken', self.csrf)
@@ -142,3 +155,37 @@ class HttpSession:
         d.addCallback(self.success_counter)
         d.addErrback(self.error_counter)
         return d
+
+    def post(self, uri, data=None, files=None):
+        uri = bytes(self.rootUrl.child(unicode(uri)).asText())
+        uri = bytes(self.child_path(uri).asText())
+        kwargs = {}
+        if data is not None:
+            kwargs['data'] = data
+        if files is not None:
+            kwargs['files'] = files
+        return self.session.post(uri, **kwargs)
+
+    def post_message(self, uri, metadata=None, raw_data=None, timeout=5.0):
+        # uri = bytes(self.rootUrl.child(unicode(uri)).asText())
+        uri = bytes(self.child_path(uri).asText())
+        post_data = {}
+        if metadata is not None:
+            # For json data to arrive in POST field in django, it must be
+            # encasulated in a regular form (= python dict which will be
+            # converted to an http form. Otherwise it will end up in the
+            # message body.
+            post_data['data'] = {'metadata' : json.dumps(metadata, ensure_ascii=True)}
+        if raw_data is not None:
+            # Sending raw (binary) via the HTTP FILES field.
+            post_data['files'] = {'raw_data' : ('data', raw_data)}
+        d = self.session.post(uri, **post_data)
+        # d.addCallback(self.post_message_callback)
+        d.addErrback (self.post_message_error)
+        return d
+
+    def post_message_callback(self, response):
+        print(response)
+
+    def post_message_error(self, failure):
+        print(failure)

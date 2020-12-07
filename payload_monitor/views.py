@@ -81,7 +81,7 @@ def generic_post(request):
     print("================ headers\n", request.headers)
     print("================ POST\n", request.POST)
     print("================ FILES\n", request.FILES)
-    print("================ BODY\n", request.body)
+    # print("================ BODY\n", request.body)
     print("\n\n\n\n\n\n")
 
     return HttpResponse(content="POST ok", status=200)
