@@ -71,7 +71,7 @@ def get_cached_data(request, dataUuid):
     return HttpResponse(content=data, status=200)
 
 
-# @csrf_protect
+@csrf_protect
 def generic_post(request):
     print("Got post request")
     return HttpResponse(content="POST ok", status=200)
