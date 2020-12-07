@@ -35,6 +35,8 @@ class OculusMonitor:
             return
         response = self.http.post_message(self.pingPostUrl,
                                           from_OculusPing(msg), msg.data)
+        response = self.http.post_message('/generic_post',
+                                          from_OculusPing(msg), msg.data)
         # if response is not None:
         #     print(response)
         #     print(response.headers)

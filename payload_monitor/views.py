@@ -2,7 +2,7 @@ import json
 
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
 
 from . import consumers
 
@@ -29,7 +29,8 @@ def webgl_test(request):
 def narval_display_test(request):
     return render(request, 'narval_display_test.html')
 
-@csrf_protect
+# @csrf_protect
+@csrf_exempt
 def post_data(request, topicName):
     if not request.method == 'POST':
         return HttpResponse(status=400)
@@ -71,9 +72,18 @@ def get_cached_data(request, dataUuid):
     return HttpResponse(content=data, status=200)
 
 
-@csrf_protect
+@csrf_exempt
 def generic_post(request):
     print("Got post request")
+    
+    print("================ META\n", request.META)
+    print("================ COOKIES\n", request.COOKIES)
+    print("================ headers\n", request.headers)
+    print("================ POST\n", request.POST)
+    print("================ FILES\n", request.FILES)
+    print("================ BODY\n", request.body)
+    print("\n\n\n\n\n\n")
+
     return HttpResponse(content="POST ok", status=200)
 
 
