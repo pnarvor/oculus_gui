@@ -26,8 +26,8 @@ class SonarDisplay extends Display
         this.busy = true;
         
         try {
-            let metadata = JSON.parse(content.content.metadata);
-            let data = new Uint8Array(await content.fetch_cached_data());
+            let metadata = JSON.parse(content.content.scalars);
+            let data = new Uint8Array(await content.fetch_cached_data('data'));
 
             this.pingRenderer.set_ping_data(metadata, data.subarray(metadata.imageOffset));
         }

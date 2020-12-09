@@ -34,26 +34,27 @@ def narval_display_test(request):
 def post_data(request, topicName):
     if not request.method == 'POST':
         return HttpResponse(status=400)
-    
-    msg = {'topic' : topicName, 'type' : 'empty', 'metadata' : 'None'}
-    if 'metadata' in request.POST:
-        msg['metadata'] = request.POST['metadata']
+
+    msg = {'topic' : topicName, 'type' : 'empty', 'scalars' : 'None', 'vectors' : 'None'}
+    if 'scalars' in request.POST:
+        msg['scalars'] = request.POST['scalars']
         msg['type']     = 'form_data'
     
     dataUuid = None
-    if 'raw_data' in request.FILES:
-        raw_data = b'';
-        count = 0
-        for chunk in request.FILES['raw_data']:
-            raw_data += chunk
-            count += 1
-        msg['type'] = 'cached_data'
-        dataUuid = cache.insert(raw_data)
-        msg['data_uuid']         = dataUuid
-        msg['cache_request_url'] = '/payload_monitor/get_cached_data/'
-
+    if len(request.FILES) > 0:
+        msg['type']    = 'cached_data'
+        msg['vectors'] = {}
+        for name, data in request.FILES.items():
+            raw_data = b'';
+            for chunk in data:
+                raw_data += chunk
+            dataUuid = cache.insert(raw_data)
+            msg['vectors'][name] = {
+                'data_uuid'         : dataUuid,
+                'cache_request_uri' : '/payload_monitor/get_cached_data/'}
+    
     for socket in consumers.register.values():
-        socket.update(text_data=json.dumps(msg))
+        socket.update(text_data=json.dumps(msg, ensure_ascii=True))
 
     response = HttpResponse(status=200)
     if dataUuid is not None:
@@ -81,6 +82,8 @@ def generic_post(request):
     print("================ headers\n", request.headers)
     print("================ POST\n", request.POST)
     print("================ FILES\n", request.FILES)
+    for f in request.FILES.items():
+        print(f)
     # print("================ BODY\n", request.body)
     print("\n\n\n\n\n\n")
 

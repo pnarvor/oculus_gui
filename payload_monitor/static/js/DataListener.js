@@ -4,18 +4,14 @@ class DataInfo
         this.content = content;
     }
 
-    async fetch_cached_data()
+    async fetch_cached_data(name)
     {
         // Two requests are sent to the server, the data is transfered twice.
         // (investigate)
-        const content = this.content
+        content = this.content.vectors[name]
         return new Promise(function(resolve, reject) {
-            if(content.type != 'cached_data') {
-                reject("no cached data to fetch");
-            }
-
             let request = new XMLHttpRequest();
-            request.open("GET", content.cache_request_url + content.data_uuid, true);
+            request.open("GET", content.cache_request_uri + content.data_uuid, true);
             request.responseType = "arraybuffer";
             request.onload = function(e) {
                 if(request.status != 200)

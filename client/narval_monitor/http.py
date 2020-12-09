@@ -189,3 +189,6 @@ class HttpSession:
 
     def post_message_error(self, failure):
         print(failure)
+
+    def print_failure(self, failure):
+        print(failure)
