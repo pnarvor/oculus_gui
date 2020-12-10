@@ -12,8 +12,8 @@ class RosHttpBridge(object):
     post requests.
 
     This was created more as a learning exercice than a real usable component
-    (if you wish to transfer ros messages to a web browser, see rosbridge
-    instead).
+    (if you wish to transfer ros messages to a web browser, you should probably
+    take a look at rosbridge instead).
     """
     def __init__(self, http, topics):
         """
@@ -34,7 +34,6 @@ class RosHttpBridge(object):
 
     def post_message(self, topicName, msgData):
         uri = bytes(self.http.child_path('post_data/' + topicName).asText())
-        # uri = bytes(self.http.child_path('generic_post').asText())
         
         postData = {}
         if 'scalars' in msgData.keys():

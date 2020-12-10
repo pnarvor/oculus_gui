@@ -2,6 +2,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 
 register = {}
+subscribers = {}
 
 class PingConsumer(WebsocketConsumer):
 
@@ -34,6 +35,29 @@ class DataUpdater(WebsocketConsumer):
 
     def disconnect(self, closeCode):
         del register[id(self)]
+    
+    def receive(self, data):
+        print("Got data from ws client :", data)
+
+    def update(self, text_data=None, bytes_data=None):
+        self.send(text_data=text_data, bytes_data=bytes_data)
+
+
+class TopicBridge(WebsocketConsumer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def connect(self):
+        # print("url argument", self.scope["url_route"]["kwargs"]["argument"])
+        self.accept()
+        self.topicName = self.scope["url_route"]["kwargs"]["topicName"]
+        if self.topicName not in subscribers.keys():
+            subscribers[self.topicName] = {}
+        subscribers[self.topicName][id(self)] = self
+
+    def disconnect(self, closeCode):
+        del subscribers[self.topicName][id(self)]
     
     def receive(self, data):
         print("Got data from ws client :", data)

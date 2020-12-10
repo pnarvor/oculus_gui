@@ -191,4 +191,5 @@ class HttpSession:
         print(failure)
 
     def print_failure(self, failure):
+        print("Printing failure")
         print(failure)

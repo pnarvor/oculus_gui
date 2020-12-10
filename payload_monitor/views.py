@@ -42,6 +42,9 @@ def post_data(request, topicName):
     
     dataUuid = None
     if len(request.FILES) > 0:
+        # Putting FILES in cache. Consumers are notified by the websocket that
+        # new data is available can should specifically ask for it with a
+        # request to get_cached_data.
         msg['type']    = 'cached_data'
         msg['vectors'] = {}
         for name, data in request.FILES.items():
@@ -53,8 +56,11 @@ def post_data(request, topicName):
                 'data_uuid'         : dataUuid,
                 'cache_request_uri' : '/payload_monitor/get_cached_data/'}
     
-    for socket in consumers.register.values():
-        socket.update(text_data=json.dumps(msg, ensure_ascii=True))
+    # for socket in consumers.register.values():
+        # socket.update(text_data=json.dumps(msg, ensure_ascii=True))
+    if topicName in consumers.subscribers.keys():
+        for socket in consumers.subscribers[topicName].values():
+            socket.update(text_data=json.dumps(msg, ensure_ascii=True))
 
     response = HttpResponse(status=200)
     if dataUuid is not None:

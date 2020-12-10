@@ -42,28 +42,6 @@ class DataListener
         for(const callback of this.callbacks) {
             callback(data);
         }
-        //let content = JSON.parse(e.data);
-        ////let metadata = undefined
-        ////if(content.metadata != 'None') {
-        ////    metadata = JSON.parse(content.metadata);
-        ////}
-        //let callbacks = this.callbacks;
-        //if(content.type == 'cached_data') {
-        //    let request = new XMLHttpRequest();
-        //    request.open("GET", content.cache_request_url + content.data_uuid, true);
-        //    request.responseType = "arraybuffer";
-        //    request.onload = function(e) {
-        //        for(const callback of callbacks) {
-        //            callback(content, request.response);
-        //        }
-        //    };
-        //    request.send(null);
-        //}
-        //else {
-        //    for(const callback of callbacks) {
-        //        callback(content, undefined);
-        //    }
-        //}
     }
 };
 
