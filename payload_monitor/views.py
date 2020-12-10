@@ -29,8 +29,8 @@ def webgl_test(request):
 def narval_display_test(request):
     return render(request, 'narval_display_test.html')
 
-# @csrf_protect
-@csrf_exempt
+@csrf_protect
+# @csrf_exempt
 def post_data(request, topicName):
     if not request.method == 'POST':
         return HttpResponse(status=400)

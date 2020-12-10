@@ -33,7 +33,7 @@ class RosHttpBridge(object):
             s.unregister()
 
     def post_message(self, topicName, msgData):
-        uri = bytes(self.http.child_path('post_data/' + topicName).asText())
+        uri = self.http.child_path('post_data/' + topicName)
         
         postData = {}
         if 'scalars' in msgData.keys():
@@ -42,5 +42,5 @@ class RosHttpBridge(object):
         if 'vectors' in msgData.keys():
             postData['files'] = msgData['vectors']
 
-        d = self.http.session.post(uri, **postData)
-        d.addErrback(self.http.print_failure)
+        d = self.http.post(uri, **postData)
+        return d

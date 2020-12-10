@@ -27,6 +27,7 @@ class OculusMonitor(RosHttpBridge):
 rospy.init_node('narval_monitor', anonymous=True, disable_signals=True)
 
 session = HttpSession(reactor, '127.0.0.1', rootUrl='payload_monitor/')
+session.connect()
 sonarMonitor = OculusMonitor(session)
 
 factory = ReconfigureBridgeFactory('oculus_sonar', 'ws://127.0.0.1:8000/ws/reconfigure_bridge/oculus_sonar/');

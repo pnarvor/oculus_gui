@@ -1,1 +1,5 @@
 Django
+daphne
+channels
+channels_redis
+

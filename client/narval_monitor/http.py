@@ -7,7 +7,9 @@ from pprint import pformat
 
 from twisted.internet.defer import Deferred, DeferredList
 from twisted.internet.protocol import Protocol
-from twisted.web.client import Agent, HTTPConnectionPool, RedirectAgent, CookieAgent, readBody
+from twisted.web.client import Agent, HTTPConnectionPool, CookieAgent
+# from twisted.web.client import RedirectAgent
+from twisted.web.client import BrowserLikeRedirectAgent as RedirectAgent
 from twisted.web.http_headers import Headers
 from twisted.python import log, compat
 from twisted.python.url import URL
@@ -41,19 +43,25 @@ class HttpSession:
         self.reactor   = reactor
         self.host      = host
         self.port      = 8000
+        
+        # the way url and handled is messed up... Cannot follow redictions
+        # self.rootUrl = URL(scheme=u'http', host=unicode(self.host),
+        #                    port=self.port).asURI()
+        
+        self.rootUrl = 'http://' + host + ':' + str(port) + '/'
 
-        self.rootUrl = URL(scheme=u'http', host=unicode(self.host),
-                           port=self.port).asURI()
         # This url is where to fetch the csrf token
         if loginUrl is None:
-            self.loginUrl = self.rootUrl
+            if rootUrl is not None:
+                self.loginUrl = self.child_path(rootUrl)
+            else:
+                self.loginUrl = self.rootUrl
         else:
-            # self.loginUrl = self.rootUrl.child(unicode(loginUrl)).asURI()
             self.loginUrl = self.child_path(loginUrl)
         # all next request will use self.rootUrl as prefix
         if rootUrl is not None:
-            # self.rootUrl = self.rootUrl.child(unicode(rootUrl)).asURI()
             self.rootUrl = self.child_path(rootUrl)
+
 
         # Client related code
         self.pool      = HTTPConnectionPool(self.reactor)
@@ -70,13 +78,27 @@ class HttpSession:
 
     def __str__(self):
         return 'HttpSession :' \
-               + '\n- host  : ' + self.rootUrl.asText() \
-               + '\n- login : ' + self.loginUrl.asText() 
+               + '\n- host  : ' + self.rootUrl \
+               + '\n- login : ' + self.loginUrl 
+               # + '\n- host  : ' + self.rootUrl.asText() \
+               # + '\n- login : ' + self.loginUrl.asText() 
     
     def child_path(self, path):
-        res = self.rootUrl
-        for p in [unicode(p) for p in path.split('/') if len(p) > 0]:
-            res = res.child(p)
+        # res = self.rootUrl
+        # for p in [unicode(p) for p in path.split('/') if len(p) > 0]:
+        #     res = res.child(p)
+        # res.child(u'')
+
+        # have to do this by hand because hyperlink.URL is messed up (cannot
+        # add a simple trailing slash)
+        if self.rootUrl[-1] == '/':
+            res = self.rootUrl[:-1]
+        else:
+            res = self.rootUrl
+        for p in ['/' + p for p in path.split('/') if len(p) > 0]:
+            res += p
+        if path[-1] == '/':
+            res += '/'
         return res
 
     def error_counter(self, failure):
@@ -91,7 +113,7 @@ class HttpSession:
 
     def success_counter(self, response):
         self.errorCount = 0
-        print("Succes, error count set to 0")
+        # print("Succes, error count set to 0")
         return response
     
     def connect(self):
@@ -102,7 +124,8 @@ class HttpSession:
         self.initiate_connection()
 
     def initiate_connection(self):
-        self.connectionCbChain = self.agent.request('GET', bytes(self.loginUrl.asText()))
+        # self.connectionCbChain = self.agent.request('GET', bytes(self.loginUrl.asText()))
+        self.connectionCbChain = self.agent.request('GET', self.loginUrl)
         self.connectionCbChain.addCallback(self.initiate_callback, self.cookieJar)
         self.connectionCbChain.addErrback(self.initiate_error)
 
@@ -144,45 +167,18 @@ class HttpSession:
         self.reactor.callLater(1.0, self.initiate_connection)
         return None # end of error chain
 
-    def request(self, method, uri, headers=None, bodyProducer=None):
-        uri = bytes(self.child_path(uri).asText())
-        if headers is None:
-            headers = Headers()
-        headers.addRawHeader('X-CSRFtoken', self.csrf)
-        d = self.agent.request(method=method, uri=uri, headers=headers, 
-                               bodyProducer=bodyProducer)
-
+    def post(self, *args, **kwargs):
+        if self.csrf is None or not self.connected:
+            return Deferred()
+        if 'headers' not in kwargs.keys():
+            kwargs['headers'] = {}
+        kwargs['headers']['X-CSRFtoken'] = self.csrf
+        d = self.session.post(*args, **kwargs)
         d.addCallback(self.success_counter)
         d.addErrback(self.error_counter)
+        d.addErrback(self.print_failure)
         return d
 
-    def post(self, uri, data=None, files=None):
-        uri = bytes(self.rootUrl.child(unicode(uri)).asText())
-        uri = bytes(self.child_path(uri).asText())
-        kwargs = {}
-        if data is not None:
-            kwargs['data'] = data
-        if files is not None:
-            kwargs['files'] = files
-        return self.session.post(uri, **kwargs)
-
-    def post_message(self, uri, metadata=None, raw_data=None, timeout=5.0):
-        # uri = bytes(self.rootUrl.child(unicode(uri)).asText())
-        uri = bytes(self.child_path(uri).asText())
-        post_data = {}
-        if metadata is not None:
-            # For json data to arrive in POST field in django, it must be
-            # encasulated in a regular form (= python dict which will be
-            # converted to an http form. Otherwise it will end up in the
-            # message body.
-            post_data['data'] = {'metadata' : json.dumps(metadata, ensure_ascii=True)}
-        if raw_data is not None:
-            # Sending raw (binary) via the HTTP FILES field.
-            post_data['files'] = {'raw_data' : ('data', raw_data)}
-        d = self.session.post(uri, **post_data)
-        # d.addCallback(self.post_message_callback)
-        d.addErrback (self.post_message_error)
-        return d
 
     def post_message_callback(self, response):
         print(response)
