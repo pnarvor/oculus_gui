@@ -33,7 +33,10 @@ session = Session('http://127.0.0.1:8000/payload_monitor/')
 
 sonarMonitor = OculusMonitor(session)
 
-factory = ReconfigureBridgeFactory('oculus_sonar', 'ws://127.0.0.1:8000/ws/reconfigure_bridge/oculus_sonar/');
+factory = ReconfigureBridgeFactory('oculus_sonar',
+    'ws://127.0.0.1:8000/ws/reconfigure_bridge/oculus_sonar/');
+factory = ReconfigureBridgeFactory('narval_recorder',
+    'ws://127.0.0.1:8000/ws/reconfigure_bridge/narval_recorder/');
 
 reactor.connectTCP("127.0.0.1", 8000, factory)
 reactor.run()

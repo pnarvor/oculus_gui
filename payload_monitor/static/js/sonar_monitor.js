@@ -9,11 +9,11 @@ $(document).ready(function() {
    $("#reconf_container")[0].appendChild(sideNav);
    $('.sidenav').sidenav({edge:'right'});
 
-    let control = new ReconfigureGUI(sideNav, "oculus_sonar");
+    //let control = new ReconfigureGUI(sideNav, "oculus_sonar");
+    let control = new ReconfigureGUI(sideNav, "narval_recorder");
     //window.onresize = function() {
     //    $("#main_display")[0].naglContext
     //        .resize(window.innerWidth, window.innerHeight);
     //};
     //window.onresize();
-
 });

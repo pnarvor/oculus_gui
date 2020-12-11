@@ -95,4 +95,3 @@ def generic_post(request):
 
     return HttpResponse(content="POST ok", status=200)
 
-
