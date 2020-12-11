@@ -38,6 +38,7 @@ class Session:
 
     def __init__(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
         self.connected = False
+        print(rootUrl)
         self.connect(rootUrl, loginUrl)
 
     def connect(self, rootUrl='http://127.0.0.1:8000/', loginUrl=None):
@@ -51,10 +52,14 @@ class Session:
         # Getting csrf token
         if self.loginUrl is None:
             self.loginUrl = self.rootUrl
+        print("HEre")
+        print(self.rootUrl)
+        print(self.loginUrl)
         attempts = 0
         self.connected = False
         while 1:
             try:
+                print(self.loginUrl)
                 self.session.get(self.loginUrl, timeout=3.0)
                 self.csrfToken = self.session.cookies['csrftoken']
                 break
@@ -72,6 +77,17 @@ class Session:
         self.connected = True
         self.session.headers.update({'X-CSRFToken': self.csrfToken})
         print("Connection to",  self.rootUrl, "succesful.")
+
+    def child_path(self, path):
+        if self.rootUrl[-1] == '/':
+            res = self.rootUrl[:-1]
+        else:
+            res = self.rootUrl
+        for p in ['/' + p for p in path.split('/') if len(p) > 0]:
+            res += p
+        if path[-1] == '/':
+            res += '/'
+        return res
 
     def post_message(self, url, metadata=None, raw_data=None, timeout=5.0):
         if not self.connected:
@@ -96,5 +112,13 @@ class Session:
             return
         r = self.session.get(self.rootUrl + url)
         return r
-
+    
+    # def post(self, url, post_data):
+    def post(self, *args, **kwargs):
+        if not self.connected:
+            return
+        # Here both the metadata and data of the message will be sent together
+        # to the server. However, in django, if metadata is present then
+        # raw_data will be ignored. (no easy fix possible)
+        return self.session.post(*args, **kwargs)
 

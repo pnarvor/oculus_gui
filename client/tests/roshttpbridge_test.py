@@ -10,7 +10,8 @@ from narval_monitor.sonar_conversions import *
 from narval_monitor.reconfigure_bridge import ReconfigureBridgeFactory
 
 from twisted.internet        import reactor
-from narval_monitor.http     import HttpSession
+# from narval_monitor.http     import HttpSession
+from narval_monitor import Session
 from narval_monitor.ros_http import RosHttpBridge
 
 def ping_conversion(msg):
@@ -26,8 +27,10 @@ class OculusMonitor(RosHttpBridge):
         
 rospy.init_node('narval_monitor', anonymous=True, disable_signals=True)
 
-session = HttpSession(reactor, '127.0.0.1', rootUrl='payload_monitor/')
-session.connect()
+# session = HttpSession(reactor, '127.0.0.1', rootUrl='payload_monitor/')
+session = Session('http://127.0.0.1:8000/payload_monitor/')
+# session.connect()
+
 sonarMonitor = OculusMonitor(session)
 
 factory = ReconfigureBridgeFactory('oculus_sonar', 'ws://127.0.0.1:8000/ws/reconfigure_bridge/oculus_sonar/');
