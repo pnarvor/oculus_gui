@@ -17,18 +17,6 @@ def status(request):
 def render_page(request, page):
     return render(request, page + '.html')
 
-@ensure_csrf_cookie
-def array_tests(request):
-    return render(request, 'array_tests.html')
-
-@ensure_csrf_cookie
-def webgl_test(request):
-    return render(request, 'webgl_test.html')
-
-@ensure_csrf_cookie
-def narval_display_test(request):
-    return render(request, 'narval_display_test.html')
-
 @csrf_protect
 # @csrf_exempt
 def post_data(request, topicName):
