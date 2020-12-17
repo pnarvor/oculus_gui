@@ -30,7 +30,9 @@ class ReconfigureBridgeProtocol(WebSocketClientProtocol):
                     param['edit_method'] = ast.literal_eval(param['edit_method']);
         self.sendMessage(json.dumps({'type'    : 'description',
                                      'target'  : self.targetNodeName,
-                                     'payload' : self.description}))
+                                     'payload' : self.description},
+                                     ensure_ascii=True,
+                                     allow_nan=False))
         print("Connection successful")
 
     def onMessage(self, msg, binary):
@@ -73,7 +75,8 @@ class ReconfigureBridgeFactory(WebSocketClientFactory, ReconnectingClientFactory
     def config_callback(self, rosMsg):
         wsMsg = json.dumps({'type'    : 'config',
                             'target'  : self.targetNodeName,
-                            'payload' : rosMsg})
+                            'payload' : rosMsg},
+                            ensure_ascii=True)
         for ws in self.openedProtocols.values():
             ws.sendMessage(wsMsg)
     
