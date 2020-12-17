@@ -118,7 +118,6 @@ class ReconfigureCheckbox extends ReconfigureInput
         return this.checkbox.checked;
     }
 };
-        // parentElement is the parent DOM element this gui will be included in.
 
 class ReconfigureRange extends ReconfigureInput
 {
@@ -164,28 +163,19 @@ class ReconfigureRange extends ReconfigureInput
 // main reconfigure gui class
 class ReconfigureGUI extends ReconfigureClient
 {
-    constructor(parentElement, target)
+    constructor(reconfContainer, target)
     {
         super(target);
+        
+        this.container = reconfContainer;
         
         this.inputs        = {}; // will contain all classes managing inputs
         this.configRequest = {};
 
-        // parentElement is the parent DOM element this gui will be included in.
-        this.parentElement = parentElement;
-
         // Main gui configuration
-        this.mainDiv       = document.createElement("div");
         this.configDiv     = document.createElement("div");
-        this.requestButton = document.createElement("a");
-        this.requestButton.classList.add("btn", "waves-effect", "waves-light");
-        this.requestButton.innerHTML = "Update Configuration";
-        this.requestButton.onclick = this.request_config.bind(this);
-
-        this.mainDiv.appendChild(this.configDiv);
-        this.mainDiv.appendChild(this.requestButton);
-
-        this.parentElement.appendChild(this.mainDiv);
+        this.generate_sidenav();
+        this.sidenav.appendChild(this.configDiv);
     }
 
     option_changed(optionName, value) {
@@ -220,6 +210,7 @@ class ReconfigureGUI extends ReconfigureClient
     }
 
     generate_gui(configDesc) {
+        
         this.inputs = {}
         while(this.configDiv.firstChild) {
             this.configDiv.removeChild(this.configDiv.firstChild);
@@ -234,6 +225,24 @@ class ReconfigureGUI extends ReconfigureClient
             form.appendChild(newInput.dom);
         }
         this.configDiv.appendChild(form);
+
+        this.requestButton = document.createElement("a");
+        this.requestButton.classList.add("btn", "waves-effect", "waves-light");
+        this.requestButton.innerHTML = "Update Configuration";
+        this.requestButton.onclick = this.request_config.bind(this);
+        this.configDiv.appendChild(this.requestButton);
+
+        // Adding a divider at the end to add some vertical space. (Otherwise,
+        // bottom scroll seems not low enough and hide request button.)
+        for(let i = 0; i < 3; i ++) {
+            let vspace = document.createElement("br");
+            //vspace.classList.add("divider");
+            //vspace.height = "100px";
+            let p = document.createElement("p");
+            p.appendChild(vspace);
+            this.configDiv.appendChild(p);
+        }
+
 
         // (TODO) would be better if specific to each input
         $(".tooltipped").tooltip();
@@ -255,6 +264,38 @@ class ReconfigureGUI extends ReconfigureClient
             console.log("Unknown input type");
             return new ReconfigureInput(inputDesc);
         }
+    }
+
+    generate_sidenav() {
+        let elms = this.container.getElementsByClassName("reconf-sidenav");
+        if(elms.length > 0) {
+            this.sidenav = elms[0];
+            return 0;
+        }
+
+        // creating side nav to contain reconfigure inputs
+        this.sidenav = document.createElement("ul");
+        this.sidenav.id = "slide-out";
+        this.sidenav.classList.add("sidenav", "reconf-sidenav");
+        this.container.appendChild(this.sidenav);
+        
+        let reconfOpenBtn = document.createElement("a");
+        reconfOpenBtn.classList.add("sidenav-trigger", "show-on-large");
+        reconfOpenBtn.setAttribute("href", "#");
+        reconfOpenBtn.setAttribute("data-target", "slide-out");
+        let icon = document.createElement("i");
+        icon.classList.add("material-icons");
+        icon.innerHTML = "settings";
+        reconfOpenBtn.appendChild(icon);
+
+        let btnContainer = document.createElement("li");
+        btnContainer.appendChild(reconfOpenBtn);
+        //btnContainer.innerHTML = "<a href=\"{% url 'status'  %}\">Status</a>"
+        $("#nav-big-right")[0].appendChild(btnContainer);
+
+        $('.sidenav').sidenav({edge:'right',
+                               onOpenEnd  : window.onresize,
+                               onCloseEnd : window.onresize});
     }
 };
 

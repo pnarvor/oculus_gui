@@ -14,6 +14,7 @@ class ReconfigureClient
 
     on_message_base(msg) {
         // here "this" refers to the websocket
+        //console.log(msg)
         let data = JSON.parse(msg.data);
         if(data.type === "config") {
             this.target.on_config(data.payload);

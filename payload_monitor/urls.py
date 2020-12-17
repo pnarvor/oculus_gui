@@ -4,7 +4,8 @@ from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='status')),
+    # path('', RedirectView.as_view(url='status')),
+    path('', RedirectView.as_view(url='view/sonar_monitor')),
     path('status', views.status, name='status'),
 
     path('view/<str:page>', views.render_page, name='generic_render'),

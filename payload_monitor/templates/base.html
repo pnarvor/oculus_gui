@@ -21,19 +21,24 @@
 </head>
 
 <body>
-    <nav class="blue-grey darken-3 z-depth-0">
-    <div class="nav-wrapper">
-        <a href="#" data-target="nav-small" class="sidenav-trigger">
-            <i class="material-icons">menu</i>
-        </a>
-        <ul id="nav-big" class="left hide-on-med-and-down">
+    <div id="main">
+        <nav id="top-nav" class="blue-grey darken-3 z-depth-0">
+        <div class="nav-wrapper">
+            <a href="#" data-target="nav-small" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul id="nav-big" class="left hide-on-med-and-down">
+                <li><a href="{% url 'status'  %}">Status</a></li>
+            </ul>
+            <ul id="nav-big-right" class="right">
+            </ul>
+        </div>
+        </nav>
+        <ul id="nav-small" class="sidenav">
             <li><a href="{% url 'status'  %}">Status</a></li>
         </ul>
     </div>
-    </nav>
-    <ul id="nav-small" class="sidenav">
-        <li><a href="{% url 'status'  %}">Status</a></li>
-    </ul>
+    <div id="reconf_container"></div>
 
     <!-- These can be overriden by block on extended pages -->
     {% block additional_body %}{% endblock %}
@@ -42,6 +47,28 @@
     <script src="{% static 'js/libs/jquery.js' %}"></script>
     <script src="{% static 'js/libs/materialize.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
+
+
+
+    <script src="{% static 'js/nagl/maths/Matrix.js' %}"></script>
+    <script src="{% static 'js/nagl/maths/Shape.js' %}"></script>
+    <script src="{% static 'js/nagl/ShaderUtils.js' %}"></script>
+    <script src="{% static 'js/nagl/Colormap.js' %}"></script>
+
+    <script src="{% static 'js/nagl/views/View.js' %}"></script>
+    <script src="{% static 'js/nagl/views/ImageView.js' %}"></script>
+
+    <script src="{% static 'js/nagl/renderers/Renderer.js' %}"></script>
+    <script src="{% static 'js/nagl/renderers/ImageRenderer.js' %}"></script>
+
+    <script src="{% static 'js/nagl/Display.js' %}"></script>
+
+    <script src="{% static 'js/DataListener.js' %}"></script>
+    <script src="{% static 'js/SonarRenderer.js' %}"></script>
+    <script src="{% static 'js/SonarDisplay.js' %}"></script>
+
+    <script src="{% static 'js/ReconfigureClient.js' %}"></script>
+    <script src="{% static 'js/ReconfigureGUI.js' %}"></script>
 
     {% block additional_scripts %}{% endblock %}
 </body>
