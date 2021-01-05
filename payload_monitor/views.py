@@ -15,7 +15,16 @@ def status(request):
 
 @ensure_csrf_cookie
 def render_page(request, page):
+    print("Here", page)
     return render(request, page + '.html')
+
+@ensure_csrf_cookie
+def sonar_monitor(request):
+    return render(request, 'sonar_monitor.html')
+
+@ensure_csrf_cookie
+def camera_monitor(request):
+    return render(request, 'camera_monitor.html')
 
 @csrf_protect
 # @csrf_exempt

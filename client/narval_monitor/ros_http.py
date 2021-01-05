@@ -31,9 +31,15 @@ class RosHttpBridge(object):
     def stop(self):
         for s in self.subscribers.values():
             s.unregister()
+    
+    def topic_to_uri(self, topicName):
+        if topicName[0] == '/':
+            return topicName[1:].replace('/', '_')
+        else:
+            return topicName.replace('/', '_')
 
     def post_message(self, topicName, msgData):
-        uri = self.http.child_path('post_data/' + topicName)
+        uri = self.http.child_path('post_data/' + self.topic_to_uri(topicName))
         
         postData = {}
         if 'scalars' in msgData.keys():
