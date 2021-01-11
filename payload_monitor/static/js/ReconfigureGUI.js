@@ -31,19 +31,20 @@ class ReconfigureSelector extends ReconfigureInput
 {
     constructor(inputDescription) {
         super(inputDescription);
-        if(inputDescription.edit_method === "") {
+        if(inputDescription.edit_method.type !== "enum") {
             console.error(inputDescription);
             throw Error("Could not build ReconfigureInutSelector");
         }
 
         // creating selector from input description
         this.selector = document.createElement("select");
-        for(const optDesc of inputDescription.edit_method.enum) {
+        for(const optDesc of inputDescription.edit_method.entries) {
             let opt = document.createElement("option");
             opt.setAttribute("value", optDesc.value.toString());
             opt.innerHTML = optDesc.name;
             this.selector.appendChild(opt);
         }
+        this.selector.value = inputDescription.current_value.toString();
         this.selector.onchange = this.onchange.bind(this);
 
         // building gui
@@ -83,7 +84,7 @@ class ReconfigureCheckbox extends ReconfigureInput
 {
     constructor(inputDescription) {
         super(inputDescription);
-        if(inputDescription.type !== "bool") {
+        if(inputDescription.edit_method.type !== "bool") {
             console.error(inputDescription);
             throw Error("Could not build ReconfigureCheckbox");
         }
@@ -92,6 +93,7 @@ class ReconfigureCheckbox extends ReconfigureInput
         this.checkbox.setAttribute("type", "checkbox");
         this.checkbox.setAttribute("checked", "checked");
         this.checkbox.classList.add("filled-in");
+        this.checkbox.checked = inputDescription.current_value;
         this.checkbox.onchange = this.onchange.bind(this);
 
         // building gui
@@ -123,7 +125,7 @@ class ReconfigureRange extends ReconfigureInput
 {
     constructor(inputDescription) {
         super(inputDescription);
-        if(!(inputDescription.type === "int" || inputDescription.type === "double")) {
+        if(inputDescription.edit_method.type !== "range") {
             console.error(inputDescription);
             throw Error("Could not build ReconfigureRange");
         }
@@ -131,10 +133,11 @@ class ReconfigureRange extends ReconfigureInput
         // creating range for input selection
         this.range = document.createElement("input");
         this.range.setAttribute("type", "range");
-        this.range.setAttribute("min",  inputDescription.min);
-        this.range.setAttribute("max",  inputDescription.max);
+        this.range.setAttribute("min",  inputDescription.edit_method.min);
+        this.range.setAttribute("max",  inputDescription.edit_method.max);
         if(inputDescription.type === "double")
             this.range.setAttribute("step", 0.1);
+        this.range.value = Number(inputDescription.current_value);
         this.range.onchange = this.onchange.bind(this);
 
         let title = document.createElement("span");
@@ -219,6 +222,8 @@ class ReconfigureGUI extends ReconfigureClient
         let form = document.createElement("form");
         form.setAttribute("action", "#");
         for(const inputDescription of configDesc) {
+            if(inputDescription.edit_method.type === "fixed")
+                continue;
             let newInput = this.create_input(inputDescription);
             newInput.set_onchange_callback(this.option_changed.bind(this));
             this.inputs[newInput.name] = newInput;
@@ -251,18 +256,28 @@ class ReconfigureGUI extends ReconfigureClient
     }
 
     create_input(inputDesc) {
-        if(inputDesc.edit_method !== "") {
-            return new ReconfigureSelector(inputDesc);
-        }
-        else if(inputDesc.type === "bool") {
-            return new ReconfigureCheckbox(inputDesc);
-        }
-        else if(inputDesc.type === "int" || inputDesc.type === "double") {
-            return new ReconfigureRange(inputDesc);
-        }
-        else {
-            console.log("Unknown input type");
-            return new ReconfigureInput(inputDesc);
+        console.log(inputDesc);
+        switch(inputDesc.edit_method.type) {
+            case "fixed":
+                console.log(inputDesc.name, "Fixed");
+                break;
+            case "bool":
+                return new ReconfigureCheckbox(inputDesc);
+                break;
+            case "range":
+                return new ReconfigureRange(inputDesc);
+                break;
+            case "unbounded":
+                console.log(inputDesc, "Unbounded parameter type not implemented yet")
+                return new ReconfigureInput(inputDesc);
+                break;
+            case "enum":
+                return new ReconfigureSelector(inputDesc);
+                break;
+            default:
+                console.log(inputDesc.name, "Unknown type :", inputDesc.edit_method.type);
+                return new ReconfigureInput(inputDesc);
+                break;
         }
     }
 

@@ -8,8 +8,7 @@ class ReconfigureClient
         this.targetUrl = 'ws://' + window.location.host
                        + '/ws/reconfigure_client/' + target + '/';
         this.websocket = new WebSocket(this.targetUrl);
-        this.websocket.onmessage = this.on_message_base;
-        this.websocket.target    = this;
+        this.websocket.onmessage = this.on_message_base.bind(this);
     }
 
     on_message_base(msg) {
@@ -17,10 +16,11 @@ class ReconfigureClient
         //console.log(msg)
         let data = JSON.parse(msg.data);
         if(data.type === "config") {
-            this.target.on_config(data.payload);
+            this.on_config(data.payload);
         }
         else if(data.type === "description") {
-            this.target.on_description(data.payload);
+            this.configDescription = data.payload;
+            this.on_description(this.configDescription);
         }
         else {
             console.log("Unknown message type");
@@ -29,8 +29,12 @@ class ReconfigureClient
     }
 
     on_config(msg) {
+        console.log("Got config");
+        console.log(msg);
     }
 
     on_description(msg) {
+        console.log("Got description");
+        console.log(msg);
     }
 };
