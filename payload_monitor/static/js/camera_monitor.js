@@ -19,6 +19,10 @@ update_size = function() {
     $("#display")[0].naglContext.resize(innerWidth, innerHeight);
 }
 
+callback = function(msg) {
+    console.log("Got image");
+}
+
 $(document).ready(function() {
 
     let canvas = document.createElement("canvas");
@@ -30,6 +34,10 @@ $(document).ready(function() {
     
     //window.onresize = update_size;
     //window.onresize();
+
+    //let imageListener = new DataListener('/ws/subscribe/camera_image_raw/');
+    //imageListener.callbacks.push(callback);
+    //$("#main")[0].appendChild(imageListener);
     
     let cameraControl   = new ReconfigureGUI($("#reconf_container")[0], "ueye_cam")
 });

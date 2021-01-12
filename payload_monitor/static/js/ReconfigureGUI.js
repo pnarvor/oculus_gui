@@ -256,7 +256,7 @@ class ReconfigureGUI extends ReconfigureClient
     }
 
     create_input(inputDesc) {
-        console.log(inputDesc);
+        // console.log(inputDesc);
         switch(inputDesc.edit_method.type) {
             case "fixed":
                 console.log(inputDesc.name, "Fixed");

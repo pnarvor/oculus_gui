@@ -29,11 +29,36 @@ class CameraDisplay
         
         //try {
             let metadata = JSON.parse(content.content.scalars);
-            let data = new Uint8ClampedArray(await content.fetch_cached_data('data'));
-            let imageData = new ImageData(data, metadata.width);
-            console.log(imageData);
+            let rgbData = new Uint8ClampedArray(await content.fetch_cached_data('data'));
+            // @#^$*!
+            //let rgbaData = new Uint8ClampedArray(4*width*heigth);
+            //for(let irgb = 0, irgba = 0; irgb < rgbData.length; irgb += 3) {
+            //    rgbaData[irgba]     = rgbData[irgb + 2];
+            //    rgbaData[irgba + 1] = rgbData[irgb + 1];
+            //    rgbaData[irgba + 2] = rgbData[irgb];
+            //    rgbaData[irgba + 3] = 255;
+            //    irgba += 4;
+            //}
+            //let imageData = new ImageData(rgbaData, metadata.width);
+
+            let subsampling = 4
+            let width  = Math.floor(metadata.width  / subsampling);
+            let height = Math.floor(metadata.height / subsampling);
+            let rgbaData = new Uint8ClampedArray(4*width*height);
+            for(let h = 0, irgb = 0; h < height; h++) {
+                for(let w = 0; w < width; w++) {
+                    let irgba = 4*(width * h + w);
+                    let irgb  = 3*subsampling*(metadata.width*w + h)
+                    
+                    rgbaData[irgba]     = rgbData[irgb];
+                    rgbaData[irgba + 1] = rgbData[irgb + 1];
+                    rgbaData[irgba + 2] = rgbData[irgb + 2];
+                    rgbaData[irgba + 3] = 255;
+                }
+            }
+            let imageData = new ImageData(rgbaData, width);
+
             this.context.drawImage(await createImageBitmap(imageData),0,0);
-            console.log(metadata);
         //}
         //finally {
             this.busy = false;
