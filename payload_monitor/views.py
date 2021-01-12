@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -45,10 +46,14 @@ def post_data(request, topicName):
         msg['type']    = 'cached_data'
         msg['vectors'] = {}
         for name, data in request.FILES.items():
-            raw_data = b'';
-            for chunk in data:
-                raw_data += chunk
-            dataUuid = cache.insert(raw_data)
+
+            # raw_data = b'';
+            # for chunk in data:
+            #     raw_data += chunk
+            # No need for a loop
+            # dataUuid = cache.insert(raw_data)
+
+            dataUuid = cache.insert(data.read())
             msg['vectors'][name] = {
                 'data_uuid'         : dataUuid,
                 'cache_request_uri' : '/payload_monitor/get_cached_data/'}
