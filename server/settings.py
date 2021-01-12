@@ -122,3 +122,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Max POST request size
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 33554432 # 32Mo
+DATA_UPLOAD_MAX_MEMORY_SIZE = 33554432 # 32Mo
+

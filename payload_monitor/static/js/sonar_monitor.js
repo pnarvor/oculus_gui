@@ -21,13 +21,13 @@ update_size = function() {
 
 $(document).ready(function() {
 
-    //let canvas = document.createElement("canvas");
-    //canvas.setAttribute("id", "display");
-    //$("#main")[0].appendChild(canvas);
-    //let display = new SonarDisplay(canvas);
-    //
-    //window.onresize = update_size;
-    //window.onresize();
+    let canvas = document.createElement("canvas");
+    canvas.setAttribute("id", "display");
+    $("#main")[0].appendChild(canvas);
+    let display = new SonarDisplay(canvas);
+    
+    window.onresize = update_size;
+    window.onresize();
     
     let sonarControl    = new ReconfigureGUI($("#reconf_container")[0], "oculus_sonar");
     //let sonarControl    = new ReconfigureClient("oculus_sonar");

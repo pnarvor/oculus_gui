@@ -21,15 +21,15 @@ update_size = function() {
 
 $(document).ready(function() {
 
-    //let canvas = document.createElement("canvas");
-    //canvas.width = 800;
-    //canvas.height = 600;
-    //canvas.setAttribute("id", "display");
-    //$("#main")[0].appendChild(canvas);
-    //let display = new CameraDisplay(canvas);
-    //
-    ////window.onresize = update_size;
-    ////window.onresize();
+    let canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.setAttribute("id", "display");
+    $("#main")[0].appendChild(canvas);
+    let display = new CameraDisplay(canvas);
+    
+    //window.onresize = update_size;
+    //window.onresize();
     
     let cameraControl   = new ReconfigureGUI($("#reconf_container")[0], "ueye_cam")
 });
