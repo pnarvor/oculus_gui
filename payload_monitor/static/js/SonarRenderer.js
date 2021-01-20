@@ -67,6 +67,7 @@ class SonarRenderer extends Renderer
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
 
         this.colormap = new Colormap(this.gl, Colormap.Viridis());
+        //this.colormap = new Colormap(this.gl, Colormap.Gray());
 
         this.beamOpening = 130.0 * Math.PI / 180.0;
         //this.beamOpening =  60.0 * Math.PI / 180.0;

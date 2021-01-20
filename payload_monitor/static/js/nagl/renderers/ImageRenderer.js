@@ -56,7 +56,8 @@ class ImageRenderer extends Renderer
 
         // cannot pre-allocate data without giving a full buffer
         this.texture  = this.gl.createTexture();
-        this.colormap = new Colormap(this.gl, Colormap.Viridis());
+        //this.colormap = new Colormap(this.gl, Colormap.Viridis());
+        this.colormap = new Colormap(this.gl, Colormap.Gray());
 
         this.directRenderProgram   = this.renderProgram;
         this.colormapRenderProgram = new Program(this.gl,
@@ -68,22 +69,28 @@ class ImageRenderer extends Renderer
         this.view.set_image_shape(shape);
         
         let dataType;
+        let internalFormat;
         if(data instanceof Float32Array) {
-            dataType = this.gl.FLOAT;
+            internalFormat = this.gl.RGB32F;
+            dataType       = this.gl.FLOAT;
+        }
+        if(data instanceof Uint8ClampedArray ||
+           data instanceof Uint8Array) {
+            internalFormat = this.gl.RGB8;
+            dataType = this.gl.UNSIGNED_BYTE;
         }
         else {
             throw Error("Data format not supported");
         }
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA32F, 
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat,
                            shape.width, shape.height, 0,
-                           //this.gl.RGB, dataType, data);
-                           this.gl.RGBA, dataType, data);
+                           this.gl.RGB, dataType, data);
         // The conversion from this.gl.RGB to this.gl.RGBA generates a warning.
         // However, with the C API counterpart, this is well defined (missing
         // color channels are set to 0, or 1 for the alpha channel). So
-        // this should work ? (check it->does not...).
+        // this should work ? (check it -> checked -> does not work).
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
@@ -101,7 +108,8 @@ class ImageRenderer extends Renderer
             internalFormat = this.gl.R32F;
             dataType       = this.gl.FLOAT;
         }
-        else if(data instanceof Uint8Array) {
+        if(data instanceof Uint8ClampedArray ||
+           data instanceof Uint8Array) {
             internalFormat = this.gl.R8;
             dataType       = this.gl.UNSIGNED_BYTE;
         }
@@ -112,7 +120,6 @@ class ImageRenderer extends Renderer
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, internalFormat,
                            shape.width, shape.height, 0,
-                           //this.gl.RGB, dataType, data);
                            this.gl.RED, dataType, data);
         // The conversion from this.gl.RGB to this.gl.RGBA generates a warning.
         // However, with the C API counterpart, this is well defined (missing

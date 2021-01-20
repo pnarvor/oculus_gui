@@ -19,21 +19,17 @@ update_size = function() {
     $("#display")[0].naglContext.resize(innerWidth, innerHeight);
 }
 
-callback = function(msg) {
-    console.log("Got image");
-}
-
 $(document).ready(function() {
 
     let canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 600;
+    //canvas.width = 800;
+    //canvas.height = 600;
     canvas.setAttribute("id", "display");
     $("#main")[0].appendChild(canvas);
     let display = new CameraDisplay(canvas);
     
-    //window.onresize = update_size;
-    //window.onresize();
+    window.onresize = update_size;
+    window.onresize();
 
     //let imageListener = new DataListener('/ws/subscribe/camera_image_raw/');
     //imageListener.callbacks.push(callback);
