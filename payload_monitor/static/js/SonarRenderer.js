@@ -28,6 +28,8 @@ class SonarRenderer extends Renderer
     uniform vec2  origin;
     uniform float iBeamOpening;
     uniform float widthScale;
+
+    uniform vec2  gainScaling;
     
     out vec4 outColor;
     
@@ -37,7 +39,10 @@ class SonarRenderer extends Renderer
                        (uv.x - origin.x) * widthScale);
         vec2 v = vec2(atan(v0.y, v0.x) * iBeamOpening + 0.5f,
                       length(v0));
-        if(v.x >= 0.0f && v.x <= 1.0f && v.y <= 1.0f)
+
+        v.x = gainScaling.x * v.x + gainScaling.y;
+        if(v.x >= gainScaling.y && v.x <= 1.0f && v.y <= 1.0f)
+        //if(v.x >= 0.0f && v.x <= 1.0f && v.y <= 1.0f)
             outColor = texture(colormap, vec2(texture(tex, v).x, 0.0f));
         else
             outColor = texture(colormap, vec2(0.0f, 0.0f));
@@ -53,6 +58,7 @@ class SonarRenderer extends Renderer
 
         // cannot pre-allocate data without giving a full buffer
         this.texture  = this.gl.createTexture();
+        this.gainSent = false;
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
@@ -77,11 +83,22 @@ class SonarRenderer extends Renderer
             //this.beamOpening =  30.0 * Math.PI / 180.0;
         }
         this.view.set_image_shape(new Shape(2.0*Math.sin(0.5*this.beamOpening), 1.0));
-
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.R8,
-                           metadata.nBeams, metadata.nRanges, 0,
-                           this.gl.RED, this.gl.UNSIGNED_BYTE, data);
+        
+        this.gainSent = (metadata.fireMessage.flags & 0x4) != 0;
+        this.nBeams = metadata.nBeams;
+        // gain is interleaved with data
+        if(!this.gainSent) {
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.R8,
+                               metadata.nBeams, metadata.nRanges, 0,
+                               this.gl.RED, this.gl.UNSIGNED_BYTE, data);
+        }
+        else {
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.R8,
+                               metadata.nBeams + 4, metadata.nRanges, 0,
+                               this.gl.RED, this.gl.UNSIGNED_BYTE, data);
+        }
     }
 
     draw() {
@@ -105,6 +122,15 @@ class SonarRenderer extends Renderer
         this.gl.uniform1f(this.renderProgram.getUniformLocation("widthScale"),
                           Math.sin(0.5*this.beamOpening));
         this.gl.uniform2f(this.renderProgram.getUniformLocation("origin"), 0.0, 1.0);
+        
+        // this part is to shift the texture a bit to avoid display of range gains.
+        let alpha = 1.0;
+        let beta  = 0.0;
+        if(this.gainSent) {
+            alpha = (this.nBeams - 4) / this.nBeams;
+            beta  = 4 / this.nBeams;
+        }
+        this.gl.uniform2f(this.renderProgram.getUniformLocation("gainScaling"), alpha, beta);
 
         let loc = this.renderProgram.getAttribLocation("point");
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, points);
