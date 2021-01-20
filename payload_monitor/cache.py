@@ -33,3 +33,6 @@ class Cache:
                 return self.data[key]
             else:
                 return None
+
+
+cache = Cache()

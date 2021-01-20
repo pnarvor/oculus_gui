@@ -66,6 +66,33 @@ class TopicBridge(WebsocketConsumer):
         self.send(text_data=text_data, bytes_data=bytes_data)
 
 
+class TopicBridge_test(WebsocketConsumer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def connect(self):
+        # print("url argument", self.scope["url_route"]["kwargs"]["argument"])
+        self.accept()
+        self.topicName = self.scope["url_route"]["kwargs"]["topicName"]
+        
+        print("")
+        print("parameter :", self.topicName)
+        # if self.topicName not in subscribers.keys():
+        #     subscribers[self.topicName] = {}
+        # subscribers[self.topicName][id(self)] = self
+
+    def disconnect(self, closeCode):
+        # del subscribers[self.topicName][id(self)]
+        pass
+    
+    def receive(self, data):
+        print("Got data from ws client :", data)
+
+    def update(self, text_data=None, bytes_data=None):
+        self.send(text_data=text_data, bytes_data=bytes_data)
+
+
 class WebSocketTest(WebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
@@ -109,4 +136,6 @@ class WebSocketTest(WebsocketConsumer):
 
     # def update(self, text_data=None, bytes_data=None):
     #     self.send(text_data=text_data, bytes_data=bytes_data)
+
+
 

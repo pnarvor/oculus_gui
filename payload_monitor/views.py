@@ -7,8 +7,9 @@ from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_
 
 from . import consumers
 
-from .cache import Cache
-cache = Cache()
+# from .cache import Cache
+# cache = Cache()
+from .cache import cache
 
 @ensure_csrf_cookie
 def status(request):
@@ -36,7 +37,7 @@ def post_data(request, topicName):
     msg = {'topic' : topicName, 'type' : 'empty', 'scalars' : 'None', 'vectors' : 'None'}
     if 'scalars' in request.POST:
         msg['scalars'] = request.POST['scalars']
-        msg['type']     = 'form_data'
+        msg['type']    = 'form_data'
     
     dataUuid = None
     if len(request.FILES) > 0:
