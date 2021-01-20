@@ -11,7 +11,8 @@ class CameraDisplay
         this.context.fillStyle = "black";
         this.context.fillRect(0, 0, canvas.width, canvas.height);
 
-        this.imageListener = new DataListener('/ws/subscribe/camera_image_raw/');
+        this.imageListener = new RosTopicListener('/camera/image_raw',
+                                                  'sensor_msgs/Image');
         this.imageListener.callbacks.push(this.image_callback.bind(this));
 
         this.busy   = false;

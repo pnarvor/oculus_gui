@@ -8,8 +8,6 @@ class SonarDisplay extends Display
         this.pingRenderer = new SonarRenderer(this.gl);
         this.add_renderer(this.pingRenderer);
 
-        //this.pingListener = new DataListener('/ws/subscribe/ping/');
-        //this.pingListener = new DataListener('/ws/subscribe/test/');
         this.pingListener = new RosTopicListener('/ping', 'oculus_sonar/OculusPing');
         this.pingListener.callbacks.push(this.ping_callback.bind(this));
 
