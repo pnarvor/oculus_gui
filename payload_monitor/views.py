@@ -21,6 +21,10 @@ def render_page(request, page):
     return render(request, page + '.html')
 
 @ensure_csrf_cookie
+def index(request):
+    return render(request, 'index.html')
+
+@ensure_csrf_cookie
 def sonar_monitor(request):
     return render(request, 'sonar_monitor.html')
 

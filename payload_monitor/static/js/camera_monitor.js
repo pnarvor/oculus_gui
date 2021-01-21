@@ -36,4 +36,5 @@ $(document).ready(function() {
     //$("#main")[0].appendChild(imageListener);
     
     let cameraControl   = new ReconfigureGUI($("#reconf_container")[0], "ueye_cam")
+    let recorderControl = new RecorderGUI($("#recorder-gui")[0], "rosbag_recorder");
 });

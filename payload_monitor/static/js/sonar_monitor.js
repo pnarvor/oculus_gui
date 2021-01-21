@@ -31,11 +31,7 @@ $(document).ready(function() {
     
     let sonarControl    = new ReconfigureGUI($("#reconf_container")[0], "oculus_sonar");
     
-    // let listener = new RosTopicListener('/ping', 'oculus_sonar/OculusPing');
-    // let ping_callback = async function(content) {
-    //     console.log(await content.fetch_cached_data('data'));
-    // }
-    // listener.callbacks.push(ping_callback);
+    let recorderControl = new RecorderGUI($("#recorder-gui")[0], "rosbag_recorder");
 });
 
 

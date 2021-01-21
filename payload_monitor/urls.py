@@ -5,9 +5,10 @@ from . import views
 
 urlpatterns = [
     # path('', RedirectView.as_view(url='status')),
-    path('', RedirectView.as_view(url='sonar_monitor')),
+    path('', RedirectView.as_view(url='index')),
     path('status', views.status, name='status'),
 
+    path('index',          views.index,          name='index'),
     path('sonar_monitor',  views.sonar_monitor,  name='sonar_monitor'),
     path('camera_monitor', views.camera_monitor, name='camera_monitor'),
 
