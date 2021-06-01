@@ -71,6 +71,16 @@ class SonarRenderer extends Renderer
 
         this.beamOpening = 130.0 * Math.PI / 180.0;
         //this.beamOpening =  60.0 * Math.PI / 180.0;
+
+        this.flipViewMatrix = Matrix.Identity(4);
+    }
+
+    horizontal_flip() {
+        this.flipViewMatrix.set_at(0,0, -this.flipViewMatrix.at(0,0));
+    }
+
+    vertical_flip() {
+        this.flipViewMatrix.set_at(1,1, -this.flipViewMatrix.at(1,1));
     }
 
     set_ping_data(metadata, data) {
@@ -114,9 +124,9 @@ class SonarRenderer extends Renderer
         this.gl.bufferData(this.gl.ARRAY_BUFFER, pointsData, this.gl.STATIC_DRAW);
 
         this.renderProgram.use();
-
-        this.gl.uniformMatrix4fv(this.renderProgram.getUniformLocation("view"),
-                                 false, this.view.full_matrix().force_column_major().elms);
+        
+        this.gl.uniformMatrix4fv(this.renderProgram.getUniformLocation("view"), false,
+            this.flipViewMatrix.multiply(this.view.full_matrix()).force_column_major().elms);
         
         this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
                           1.0 / this.beamOpening);
