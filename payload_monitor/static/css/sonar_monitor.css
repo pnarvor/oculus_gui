@@ -17,3 +17,16 @@
     height: 100%;
 }
 
+.sonar-btn-row {
+    display: flex;
+    flew-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.sonar-infos {
+    margin-left: 10px;
+}
+
