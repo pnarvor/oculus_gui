@@ -9,6 +9,10 @@ class SonarDisplay extends Display
 
         this.pingRenderer = new SonarRenderer(this.gl);
         this.add_renderer(this.pingRenderer);
+        this.gl.clearColor(this.pingRenderer.zeroColor[0],
+                           this.pingRenderer.zeroColor[1],
+                           this.pingRenderer.zeroColor[2],
+                           this.pingRenderer.zeroColor[3]);
 
         this.pingListener = new RosTopicListener('/ping', 'oculus_sonar/OculusPing');
         this.pingListener.callbacks.push(this.ping_callback.bind(this));

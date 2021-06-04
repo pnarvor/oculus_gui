@@ -5,7 +5,10 @@ class Colormap
     {
         this.gl = gl;
         this.texture = this.gl.createTexture();
-
+        this.minColor = new Float32Array([colormap[0],
+                                          colormap[1],
+                                          colormap[2],
+                                          colormap[3]]);
         this.load(colormap);
     }
     

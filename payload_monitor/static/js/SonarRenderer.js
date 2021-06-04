@@ -24,6 +24,7 @@ class SonarRenderer extends Renderer
     in vec2 uv;
     uniform sampler2D tex;
     uniform sampler2D colormap;
+    uniform vec4 zeroColor;
 
     uniform vec2  origin;
     uniform float iBeamOpening;
@@ -45,14 +46,12 @@ class SonarRenderer extends Renderer
         //if(v.x >= 0.0f && v.x <= 1.0f && v.y <= 1.0f)
             outColor = texture(colormap, vec2(texture(tex, v).x, 0.0f));
         else
-            outColor = texture(colormap, vec2(0.0f, 0.0f));
+            outColor = zeroColor;
 
     }`;
 
     constructor(gl) {
         super(gl, new ImageView(),
-              //ImageRenderer.defaultVertexShader,
-              //ImageRenderer.colormapFragmentShader);
               SonarRenderer.vertexShader,
               SonarRenderer.fragmentShader);
 
@@ -68,6 +67,7 @@ class SonarRenderer extends Renderer
 
         this.colormap = new Colormap(this.gl, Colormap.Viridis());
         //this.colormap = new Colormap(this.gl, Colormap.Gray());
+        this.zeroColor = this.colormap.minColor;
 
         this.beamOpening = 130.0 * Math.PI / 180.0;
         //this.beamOpening = 80.0 * Math.PI / 180.0;
@@ -133,6 +133,7 @@ class SonarRenderer extends Renderer
         this.gl.uniform1f(this.renderProgram.getUniformLocation("widthScale"),
                           Math.sin(0.5*this.beamOpening));
         this.gl.uniform2f(this.renderProgram.getUniformLocation("origin"), 0.0, 1.0);
+        this.gl.uniform4fv(this.renderProgram.getUniformLocation("zeroColor"), this.zeroColor);
         
         // this part is to shift the texture a bit to avoid display of range gains.
         let alpha = 1.0;
