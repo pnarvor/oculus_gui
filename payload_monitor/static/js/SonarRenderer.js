@@ -70,7 +70,7 @@ class SonarRenderer extends Renderer
         //this.colormap = new Colormap(this.gl, Colormap.Gray());
 
         this.beamOpening = 130.0 * Math.PI / 180.0;
-        //this.beamOpening =  60.0 * Math.PI / 180.0;
+        //this.beamOpening = 80.0 * Math.PI / 180.0;
 
         this.flipViewMatrix = Matrix.Identity(4);
     }
@@ -87,11 +87,11 @@ class SonarRenderer extends Renderer
         
         if(metadata.fireMessage.masterMode == 1) {
             this.beamOpening = 130.0 * Math.PI / 180.0;
-            //this.beamOpening = 90.0 * Math.PI / 180.0;
         }
         else {
-            this.beamOpening =  60.0 * Math.PI / 180.0;
-            //this.beamOpening =  30.0 * Math.PI / 180.0;
+            // 60deg or 80deg ? (80deg in doc)
+            //this.beamOpening =  60.0 * Math.PI / 180.0; 
+            this.beamOpening =  80.0 * Math.PI / 180.0;
         }
         this.view.set_image_shape(new Shape(2.0*Math.sin(0.5*this.beamOpening), 1.0));
         
