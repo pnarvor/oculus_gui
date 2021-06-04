@@ -1,5 +1,3 @@
-
-
 class Display
 {
     constructor(canvas)
@@ -18,6 +16,11 @@ class Display
     resize(width, height) {
         this.canvas.width  = width;
         this.canvas.height = height;
+    }
+
+    match_display_size() {
+        this.canvas.width  = this.canvas.clientWidth;
+        this.canvas.height = this.canvas.clientHeight;
     }
 
     screen_shape() {

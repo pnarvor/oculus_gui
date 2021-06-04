@@ -41,6 +41,7 @@
             <li><a href="{% url 'sonar_monitor'  %}">Sonar</a></li>
             <li><a href="{% url 'camera_monitor'  %}">Camera</a></li>
         </ul>
+        {% block sonar_gui %}{% endblock %}
     </div>
     <div id="reconf_container"></div>
 
