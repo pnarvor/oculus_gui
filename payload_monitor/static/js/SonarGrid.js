@@ -57,12 +57,14 @@ class SonarGrid extends Renderer
         outColor = c;
     }`;
 
-    constructor(gl, view, size = 512, 
+    constructor(container, gl, view, size = 512, 
                 color = new Float32Array([0.6,0.6,0.7,1.0]))
     {
+        console.log(container);
         super(gl, view,
               SonarGrid.vertexShader,
               SonarGrid.fragmentShader);
+        this.container = container;
         this.color = color;
         this.size = size;
 
@@ -88,19 +90,30 @@ class SonarGrid extends Renderer
         this.targetTicksCount = 5;
     }
     
-    update_ticks() {
+    update_beam() {
         if(this.range == this.view.range && this.beamOpening == this.view.beamOpening) {
             return;
         }
+        this.update_ticks();
+    }
+
+    update_ticks() {
 
         // new range. Clearing current ticks
+        for(const t of this.ticks) {
+            this.container.removeChild(t.label);
+        }
         this.ticks = []
         let tickValues = Tick.nice_tick_values(0.0, this.view.range, 5);
+        
         for(const v of tickValues) {
             if(v <= 0) continue;
             if(v > this.view.range) break;
-
-            let tick = new Tick(v, this.view.get_tick_position(v));
+            
+            let position = this.get_tick_position(v);
+            let tick = new Tick(v, [position[0] + 10 + this.container.offsetLeft,
+                                    position[1] - 20 + this.container.offsetTop]);
+            this.container.appendChild(tick.label);
 
             this.ticks.push(tick);
         }
@@ -109,8 +122,18 @@ class SonarGrid extends Renderer
         this.beamOpening = this.view.beamOpening;
     }
 
+    get_tick_position(range) {
+
+        range = 2.0 * range / this.view.range;
+        let opening = 0.5*(this.view.beamOpening + 0.02 / range);
+        let widthScale = 0.5 / Math.sin(0.5*this.view.beamOpening);
+        
+        return this.view.get_screen_position(range*widthScale*Math.sin(opening),
+                                             1.0 - range*Math.cos(opening));
+    }
+
     draw() {
-        let view = this.view.full_matrix();
+        let view = this.view.full_matrix().force_column_major();
 
         this.draw_sides(view);
         for(const tick of this.ticks) {

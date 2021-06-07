@@ -52,11 +52,13 @@ class Tick
     constructor(value, screenPosition) {
         this.value = value;
         this.label = document.createElement("div");
-        this.label.classList.add("tick-label");
-        this.label.innerHTML = this.value;
+        this.label.classList.add("sonar-tick-label");
+        this.label.innerHTML = this.value.toString() + "m";
 
-        this.label.style.position = "relative";
-        this.label.style.left = screenPosition[0]
-        this.label.style.top = screenPosition[1];
+        //this.label.style.position = "relative";
+        this.label.style.position = "absolute";
+        this.label.style.left = Math.floor(screenPosition[0]).toString() + "px";
+        this.label.style.top  = Math.floor(screenPosition[1]).toString() + "px";
+        this.label.style.color = "#9999b3";
     }
 };

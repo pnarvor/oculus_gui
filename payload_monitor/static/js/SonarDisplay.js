@@ -2,13 +2,14 @@ class SonarDisplay extends Display
 {
     constructor(container)
     {
-        console.log(container);
         super(container.getElementsByClassName("sonar-canvas")[0]);
 
         this.container = container
 
         this.pingRenderer = new SonarRenderer(this.gl);
-        this.sonarGrid = new SonarGrid(this.gl, this.pingRenderer.view);
+        this.sonarGrid = new SonarGrid(
+            this.container.getElementsByClassName("sonar-display-col")[0],
+            this.gl, this.pingRenderer.view);
         this.add_renderer(this.pingRenderer);
         this.add_renderer(this.sonarGrid);
 
@@ -24,15 +25,23 @@ class SonarDisplay extends Display
         
         // Binding buttons to SonarDisplay control methods
         this.vFlipButton = container.getElementsByClassName("sonar-vflip")[0];
-        this.vFlipButton.onclick = 
-            this.pingRenderer.vertical_flip.bind(this.pingRenderer);
+        this.vFlipButton.onclick = this.vertical_flip.bind(this);
         this.hFlipButton = container.getElementsByClassName("sonar-hflip")[0];
-        this.hFlipButton.onclick = 
-            this.pingRenderer.horizontal_flip.bind(this.pingRenderer);
+        this.hFlipButton.onclick = this.horizontal_flip.bind(this);
 
         // auto resizing of display area.
         window.onresize = this.match_display_size.bind(this);
         this.match_display_size();
+    }
+
+    vertical_flip() {
+        this.pingRenderer.view.vertical_flip();
+        this.sonarGrid.update_ticks();
+    }
+
+    horizontal_flip() {
+        this.pingRenderer.view.horizontal_flip();
+        this.sonarGrid.update_ticks();
     }
 
     async ping_callback(content)
@@ -50,8 +59,7 @@ class SonarDisplay extends Display
             let data = new Uint8Array(await content.fetch_cached_data('data'));
 
             this.pingRenderer.set_ping_data(metadata, data.subarray(metadata.imageOffset));
-
-            this.sonarGrid.update_ticks();
+            this.sonarGrid.update_beam();
         }
         finally {
             this.busy = false;

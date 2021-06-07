@@ -72,14 +72,6 @@ class SonarRenderer extends Renderer
         this.zeroColor = this.colormap.minColor;
     }
 
-    horizontal_flip() {
-        this.view.horizontal_flip();
-    }
-
-    vertical_flip() {
-        this.view.vertical_flip();
-    }
-
     set_ping_data(metadata, data) {
         if(metadata.fireMessage.masterMode == 1) {
             this.view.set_beam_opening(130.0 * Math.PI / 180.0);
