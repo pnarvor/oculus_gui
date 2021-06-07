@@ -16,11 +16,14 @@ class Display
     resize(width, height) {
         this.canvas.width  = width;
         this.canvas.height = height;
+        for(let view of this.views) {
+            view.set_screen_shape(this.screen_shape());
+        }
     }
 
     match_display_size() {
-        this.canvas.width  = this.canvas.clientWidth;
-        this.canvas.height = this.canvas.clientHeight;
+        this.resize(this.canvas.clientWidth,
+                    this.canvas.clientHeight);
     }
 
     screen_shape() {
@@ -42,10 +45,7 @@ class Display
     }
 
     draw() {
-        for(let view of this.views) {
-            view.set_screen_shape(this.screen_shape());
-        }
-        this.gl.viewport(0,0, this.canvas.width, this.canvas.height);
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.GL_DEPTH_BUFFER_BIT);
         for(let renderer of this.renderers) {
             renderer.draw();

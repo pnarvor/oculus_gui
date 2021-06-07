@@ -81,14 +81,14 @@ class SonarGrid extends Renderer
         this.sides = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.sides);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
-
-        this.lastRange        = 0;
+        
+        this.range            = 0;
         this.ticks            = []
         this.targetTicksCount = 5;
     }
     
     update_ticks(range) {
-        if(range == this.lastRange) return;
+        if(range == this.range) return;
 
         // new range. Clearing current ticks
         this.ticks = []
@@ -99,20 +99,20 @@ class SonarGrid extends Renderer
             this.ticks.push(new Tick(v));
         }
 
-        this.lastRange = range;
+        this.range = range;
     }
 
-    draw(view, beamOpening, range) {
-        this.update_ticks(range);
+    draw(beamOpening, range) {
+        let view = this.view.full_matrix();
 
-        this.draw_sides(view, beamOpening, range);
+        this.draw_sides(view, beamOpening);
         for(const tick of this.ticks) {
-            this.draw_range(view, beamOpening, tick.value / range, true);
+            this.draw_range(view, beamOpening, tick.value / this.range, true);
         }
         this.draw_range(view, beamOpening, 1.0, false);
     }
 
-    draw_sides(view, beamOpening, range) {
+    draw_sides(view, beamOpening) {
 
         this.sidesProgram.use();
         this.gl.uniformMatrix4fv(this.sidesProgram.getUniformLocation("view"), false,
@@ -214,7 +214,7 @@ class SonarRenderer extends Renderer
     }`;
 
     constructor(gl) {
-        super(gl, new ImageView(),
+        super(gl, new SonarView(),
               SonarRenderer.vertexShader,
               SonarRenderer.fragmentShader);
 
@@ -236,17 +236,15 @@ class SonarRenderer extends Renderer
         //this.beamOpening = 80.0 * Math.PI / 180.0;
         this.range = 1;
 
-        this.flipViewMatrix = Matrix.Identity(4);
-
         this.sonarGrid = new SonarGrid(gl, this.view);
     }
 
     horizontal_flip() {
-        this.flipViewMatrix.set_at(0,0, -this.flipViewMatrix.at(0,0));
+        this.view.horizontal_flip();
     }
 
     vertical_flip() {
-        this.flipViewMatrix.set_at(1,1, -this.flipViewMatrix.at(1,1));
+        this.view.vertical_flip();
     }
 
     set_ping_data(metadata, data) {
@@ -276,6 +274,9 @@ class SonarRenderer extends Renderer
                                metadata.nBeams + 4, metadata.nRanges, 0,
                                this.gl.RED, this.gl.UNSIGNED_BYTE, data);
         }
+
+        // updating grid display.
+        this.sonarGrid.update_ticks(this.range);
     }
 
     draw() {
@@ -291,9 +292,8 @@ class SonarRenderer extends Renderer
 
         this.renderProgram.use();
         
-        let view = this.flipViewMatrix.multiply(this.view.full_matrix());
         this.gl.uniformMatrix4fv(this.renderProgram.getUniformLocation("view"), false,
-            view.force_column_major().elms);
+            this.view.full_matrix().force_column_major().elms);
         
         this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
                           1.0 / this.beamOpening);
@@ -325,7 +325,7 @@ class SonarRenderer extends Renderer
         this.colormap.bind(this.gl.TEXTURE_2D);
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-        this.sonarGrid.draw(view, this.beamOpening, this.range);
+        
+        this.sonarGrid.draw(this.beamOpening);
     }
 };

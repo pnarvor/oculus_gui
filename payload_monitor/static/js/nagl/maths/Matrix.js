@@ -58,7 +58,7 @@ class Matrix
         if(nCols == undefined) {
             nCols = nRows;
         }
-        // defaults to row major ordering
+        // defaults to column major ordering (to be checked)
         if(rStride == undefined) {
             rStride = 1;
         }

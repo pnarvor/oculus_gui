@@ -54,6 +54,5 @@ class Tick
         this.label = document.createElement("div");
         this.label.classList.add("tick-label");
         this.label.innerHTML = this.value;
-        console.log(this.label);
     }
 };
