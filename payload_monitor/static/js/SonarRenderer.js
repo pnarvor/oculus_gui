@@ -1,3 +1,138 @@
+class SonarGrid extends Renderer
+{
+    static vertexShader =
+    `#version 300 es
+    
+    in float point;
+    uniform mat4 view;
+
+    uniform vec2  origin;
+    uniform float iBeamOpening;
+    uniform float widthScale;
+    uniform float iRange;
+    uniform vec4 cIn;
+
+    out vec4 c;
+    
+    void main()
+    {
+        vec2 v0     = origin + iRange*vec2(widthScale*sin(iBeamOpening*point), 
+                                           -cos(iBeamOpening*point));
+        gl_Position = view*vec4(v0, 0.0, 1.0);
+        c = cIn;
+    }`;
+
+    static sidesVertexShader =
+    `#version 300 es
+    
+    in vec2 point;
+    uniform mat4 view;
+
+    uniform vec2  origin;
+    uniform float iBeamOpening;
+    uniform float widthScale;
+    uniform vec4 cIn;
+
+    out vec4 c;
+    
+    void main()
+    {
+        vec2 v0     = origin + point.y*vec2(widthScale*sin(iBeamOpening*point.x), 
+                                            -cos(iBeamOpening*point.x));
+        gl_Position = view*vec4(v0, 0.0, 1.0);
+        c = cIn;
+    }`;
+
+    static fragmentShader =
+    `#version 300 es
+    #ifdef GL_ES
+    	precision highp float;
+    #endif
+
+    in  vec4 c; 
+    out vec4 outColor;
+    
+    void main()
+    {
+        outColor = c;
+    }`;
+
+    constructor(gl, size = 512, 
+                color = new Float32Array([0.8,0.8,0.9,1.0]))
+    {
+        super(gl, new ImageView(),
+              SonarGrid.vertexShader,
+              SonarGrid.fragmentShader);
+        this.color = color;
+        this.size = size;
+
+        let data  = new Float32Array(size);
+        for(let i = 0; i < data.length; i++)
+            data[i] = i / (data.length - 1) - 0.5;
+        this.points = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.points);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+        
+        // loading sides program
+        this.sidesProgram = new Program(gl,
+            [new Shader(gl, SonarGrid.sidesVertexShader,   gl.VERTEX_SHADER),
+             new Shader(gl, SonarGrid.fragmentShader, gl.FRAGMENT_SHADER)]);
+        data  = new Float32Array([-0.5,0.0,-0.5,2.0,0.5,0.0,0.5,2.0]);
+        this.sides = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.sides);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+    }
+
+
+    draw(view, beamOpening, range) {
+        this.draw_sides(view, beamOpening, range);
+        this.draw_range(view, beamOpening, 0.25);
+        this.draw_range(view, beamOpening, 0.5);
+        this.draw_range(view, beamOpening, 0.75);
+        this.draw_range(view, beamOpening, 1.0);
+    }
+
+    draw_sides(view, beamOpening, range) {
+
+        this.sidesProgram.use();
+        this.gl.uniformMatrix4fv(this.sidesProgram.getUniformLocation("view"), false,
+            view.force_column_major().elms);
+        this.gl.uniform2f(this.sidesProgram.getUniformLocation("origin"), 0.0, 1.0);
+        this.gl.uniform1f(this.sidesProgram.getUniformLocation("iBeamOpening"), beamOpening);
+        this.gl.uniform1f(this.sidesProgram.getUniformLocation("widthScale"), 
+                          0.5 / Math.sin(0.5*beamOpening));
+        this.gl.uniform4fv(this.sidesProgram.getUniformLocation("cIn"), this.color);
+
+        let loc = this.sidesProgram.getAttribLocation("point");
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.sides);
+        this.gl.enableVertexAttribArray(loc);
+        this.gl.vertexAttribPointer(loc, 2, this.gl.FLOAT, false, 0, 0);
+
+        this.gl.drawArrays(this.gl.LINES, 0, 4);
+    }
+
+    draw_range(view, beamOpening, range) {
+
+        this.renderProgram.use();
+        this.gl.uniformMatrix4fv(this.renderProgram.getUniformLocation("view"), false,
+            view.force_column_major().elms);
+        this.gl.uniform2f(this.renderProgram.getUniformLocation("origin"), 0.0, 1.0);
+        this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
+                          beamOpening + 0.02 / range);
+        this.gl.uniform1f(this.renderProgram.getUniformLocation("widthScale"), 
+                          0.5 / Math.sin(0.5*beamOpening));
+        this.gl.uniform1f(this.renderProgram.getUniformLocation("iRange"), 2.0*range);
+        this.gl.uniform4fv(this.renderProgram.getUniformLocation("cIn"), this.color);
+
+        let loc = this.renderProgram.getAttribLocation("point");
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.points);
+        this.gl.enableVertexAttribArray(loc);
+        this.gl.vertexAttribPointer(loc, 1, this.gl.FLOAT, false, 0, 0);
+
+        this.gl.drawArrays(this.gl.LINE_STRIP, 0, this.size);
+    }
+};
+
 
 
 class SonarRenderer extends Renderer
@@ -36,8 +171,10 @@ class SonarRenderer extends Renderer
     
     void main()
     {
+        // local coordinates inside the image (bounded by [-1,1])
         vec2 v0 = vec2(-0.5f*(uv.y - origin.y),
                        (uv.x - origin.x) * widthScale);
+        // coordinates inside the sonar fan (angle, range).
         vec2 v = vec2(atan(v0.y, v0.x) * iBeamOpening + 0.5f,
                       length(v0));
 
@@ -71,8 +208,11 @@ class SonarRenderer extends Renderer
 
         this.beamOpening = 130.0 * Math.PI / 180.0;
         //this.beamOpening = 80.0 * Math.PI / 180.0;
+        this.range = 1;
 
         this.flipViewMatrix = Matrix.Identity(4);
+
+        this.sonarGrid = new SonarGrid(gl);
     }
 
     horizontal_flip() {
@@ -84,7 +224,6 @@ class SonarRenderer extends Renderer
     }
 
     set_ping_data(metadata, data) {
-        
         if(metadata.fireMessage.masterMode == 1) {
             this.beamOpening = 130.0 * Math.PI / 180.0;
         }
@@ -94,6 +233,7 @@ class SonarRenderer extends Renderer
             this.beamOpening =  80.0 * Math.PI / 180.0;
         }
         this.view.set_image_shape(new Shape(2.0*Math.sin(0.5*this.beamOpening), 1.0));
+        this.range = metadata.fireMessage.range;
         
         this.gainSent = (metadata.fireMessage.flags & 0x4) != 0;
         this.nBeams = metadata.nBeams;
@@ -125,8 +265,9 @@ class SonarRenderer extends Renderer
 
         this.renderProgram.use();
         
+        let view = this.flipViewMatrix.multiply(this.view.full_matrix());
         this.gl.uniformMatrix4fv(this.renderProgram.getUniformLocation("view"), false,
-            this.flipViewMatrix.multiply(this.view.full_matrix()).force_column_major().elms);
+            view.force_column_major().elms);
         
         this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
                           1.0 / this.beamOpening);
@@ -158,5 +299,7 @@ class SonarRenderer extends Renderer
         this.colormap.bind(this.gl.TEXTURE_2D);
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+
+        this.sonarGrid.draw(view, this.beamOpening, this.range);
     }
 };

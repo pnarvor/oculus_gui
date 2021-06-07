@@ -5,7 +5,7 @@ class Display
         canvas.naglContext = this; // canvas will hold a reference to this.
 
         this.canvas = canvas;
-        this.gl     = this.canvas.getContext("webgl2", {antialias : false});
+        this.gl     = this.canvas.getContext("webgl2", {antialias : true});
 
         this.gl.clearColor(0.0,0.0,0.0,1.0);
 
