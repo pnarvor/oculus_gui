@@ -83,23 +83,27 @@ class SonarGrid extends Renderer
         this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
         
         this.range            = 0;
+        this.beamOpening      = 0;
         this.ticks            = []
         this.targetTicksCount = 5;
     }
     
-    update_ticks(range) {
-        if(range == this.range) return;
+    update_ticks() {
+        if(this.range == this.view.range && this.beamOpening == this.view.beamOpening) {
+            return;
+        }
 
         // new range. Clearing current ticks
         this.ticks = []
-        let tickValues = Tick.nice_tick_values(0.0, range, 5);
+        let tickValues = Tick.nice_tick_values(0.0, this.view.range, 5);
         for(const v of tickValues) {
             if(v <= 0) continue;
-            if(v > range) break;
+            if(v > this.view.range) break;
             this.ticks.push(new Tick(v));
         }
 
-        this.range = range;
+        this.range       = this.view.range;
+        this.beamOpening = this.view.beamOpening;
     }
 
     draw(beamOpening, range) {
@@ -232,10 +236,6 @@ class SonarRenderer extends Renderer
         //this.colormap = new Colormap(this.gl, Colormap.Gray());
         this.zeroColor = this.colormap.minColor;
 
-        this.beamOpening = 130.0 * Math.PI / 180.0;
-        //this.beamOpening = 80.0 * Math.PI / 180.0;
-        this.range = 1;
-
         this.sonarGrid = new SonarGrid(gl, this.view);
     }
 
@@ -249,15 +249,12 @@ class SonarRenderer extends Renderer
 
     set_ping_data(metadata, data) {
         if(metadata.fireMessage.masterMode == 1) {
-            this.beamOpening = 130.0 * Math.PI / 180.0;
+            this.view.set_beam_opening(130.0 * Math.PI / 180.0);
         }
         else {
-            // 60deg or 80deg ? (80deg in doc)
-            //this.beamOpening =  60.0 * Math.PI / 180.0; 
-            this.beamOpening =  80.0 * Math.PI / 180.0;
+            this.view.set_beam_opening(80.0 * Math.PI / 180.0);
         }
-        this.view.set_image_shape(new Shape(2.0*Math.sin(0.5*this.beamOpening), 1.0));
-        this.range = metadata.fireMessage.range;
+        this.view.set_range(metadata.fireMessage.range);
         
         this.gainSent = (metadata.fireMessage.flags & 0x4) != 0;
         this.nBeams = metadata.nBeams;
@@ -276,7 +273,7 @@ class SonarRenderer extends Renderer
         }
 
         // updating grid display.
-        this.sonarGrid.update_ticks(this.range);
+        this.sonarGrid.update_ticks();
     }
 
     draw() {
@@ -296,9 +293,9 @@ class SonarRenderer extends Renderer
             this.view.full_matrix().force_column_major().elms);
         
         this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
-                          1.0 / this.beamOpening);
+                          1.0 / this.view.beamOpening);
         this.gl.uniform1f(this.renderProgram.getUniformLocation("widthScale"),
-                          Math.sin(0.5*this.beamOpening));
+                          Math.sin(0.5*this.view.beamOpening));
         this.gl.uniform2f(this.renderProgram.getUniformLocation("origin"), 0.0, 1.0);
         this.gl.uniform4fv(this.renderProgram.getUniformLocation("zeroColor"), this.zeroColor);
         
@@ -326,6 +323,6 @@ class SonarRenderer extends Renderer
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         
-        this.sonarGrid.draw(this.beamOpening);
+        this.sonarGrid.draw(this.view.beamOpening);
     }
 };

@@ -2,9 +2,20 @@
 
 class SonarView extends ImageView
 {
-    constructor(imageShape = new Shape(1.0, 1.0)) {
-        super(imageShape);
+    constructor(beamOpening = 1.5, range = 1.0) {
+        super();
         this.flipViewMatrix = Matrix.Identity(4);
+        this.set_beam_opening(beamOpening);
+        this.set_range(range);
+    }
+
+    set_beam_opening(beamOpening) {
+        this.set_image_shape(new Shape(2.0*Math.sin(0.5*this.beamOpening), 1.0));
+        this.beamOpening = beamOpening;
+    }
+
+    set_range(range) {
+        this.range = range;
     }
 
     horizontal_flip() {
