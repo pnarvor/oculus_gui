@@ -49,10 +49,14 @@ class Tick
         return ticks;
     }
 
-    constructor(value) {
+    constructor(value, screenPosition) {
         this.value = value;
         this.label = document.createElement("div");
         this.label.classList.add("tick-label");
         this.label.innerHTML = this.value;
+
+        this.label.style.position = "relative";
+        this.label.style.left = screenPosition[0]
+        this.label.style.top = screenPosition[1];
     }
 };

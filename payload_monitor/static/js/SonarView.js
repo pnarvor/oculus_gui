@@ -29,5 +29,15 @@ class SonarView extends ImageView
     full_matrix() {
         return this.flipViewMatrix.multiply(ImageView.prototype.full_matrix.call(this));
     }
+
+    get_tick_position(range) {
+
+        range = 2.0 * range / this.range;
+        let opening = 0.5*(this.beamOpening + 0.02 / range);
+        let widthScale = Math.sin(0.5*this.beamOpening);
+        
+        return this.get_screen_position(range*widthScale*Math.sin(opening),
+                                        1.0 - range*Math.cos(opening));
+    }
 };
 

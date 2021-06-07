@@ -8,7 +8,10 @@ class SonarDisplay extends Display
         this.container = container
 
         this.pingRenderer = new SonarRenderer(this.gl);
+        this.sonarGrid = new SonarGrid(this.gl, this.pingRenderer.view);
         this.add_renderer(this.pingRenderer);
+        this.add_renderer(this.sonarGrid);
+
         this.gl.clearColor(this.pingRenderer.zeroColor[0],
                            this.pingRenderer.zeroColor[1],
                            this.pingRenderer.zeroColor[2],
@@ -47,6 +50,8 @@ class SonarDisplay extends Display
             let data = new Uint8Array(await content.fetch_cached_data('data'));
 
             this.pingRenderer.set_ping_data(metadata, data.subarray(metadata.imageOffset));
+
+            this.sonarGrid.update_ticks();
         }
         finally {
             this.busy = false;
