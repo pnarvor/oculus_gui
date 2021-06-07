@@ -18,7 +18,7 @@ class Renderer
     static defaultFragmentShader =
     `#version 300 es
     #ifdef GL_ES
-    	precision highp float;
+        precision highp float;
     #endif
     
     in vec3 c;

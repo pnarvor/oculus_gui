@@ -46,7 +46,7 @@ class SonarGrid extends Renderer
     static fragmentShader =
     `#version 300 es
     #ifdef GL_ES
-    	precision highp float;
+        precision highp float;
     #endif
 
     in  vec4 c; 
@@ -57,10 +57,10 @@ class SonarGrid extends Renderer
         outColor = c;
     }`;
 
-    constructor(gl, size = 512, 
-                color = new Float32Array([0.8,0.8,0.9,1.0]))
+    constructor(gl, view, size = 512, 
+                color = new Float32Array([0.6,0.6,0.7,1.0]))
     {
-        super(gl, new ImageView(),
+        super(gl, view,
               SonarGrid.vertexShader,
               SonarGrid.fragmentShader);
         this.color = color;
@@ -81,15 +81,35 @@ class SonarGrid extends Renderer
         this.sides = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.sides);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+
+        this.lastRange        = 0;
+        this.ticks            = []
+        this.targetTicksCount = 5;
+    }
+    
+    update_ticks(range) {
+        if(range == this.lastRange) return;
+
+        // new range. Clearing current ticks
+        this.ticks = []
+        let tickValues = Tick.nice_tick_values(0.0, range, 5);
+        for(const v of tickValues) {
+            if(v <= 0) continue;
+            if(v > range) break;
+            this.ticks.push(new Tick(v));
+        }
+
+        this.lastRange = range;
     }
 
-
     draw(view, beamOpening, range) {
+        this.update_ticks(range);
+
         this.draw_sides(view, beamOpening, range);
-        this.draw_range(view, beamOpening, 0.25);
-        this.draw_range(view, beamOpening, 0.5);
-        this.draw_range(view, beamOpening, 0.75);
-        this.draw_range(view, beamOpening, 1.0);
+        for(const tick of this.ticks) {
+            this.draw_range(view, beamOpening, tick.value / range, true);
+        }
+        this.draw_range(view, beamOpening, 1.0, false);
     }
 
     draw_sides(view, beamOpening, range) {
@@ -111,14 +131,20 @@ class SonarGrid extends Renderer
         this.gl.drawArrays(this.gl.LINES, 0, 4);
     }
 
-    draw_range(view, beamOpening, range) {
+    draw_range(view, beamOpening, range, withTicks = false) {
 
         this.renderProgram.use();
         this.gl.uniformMatrix4fv(this.renderProgram.getUniformLocation("view"), false,
             view.force_column_major().elms);
         this.gl.uniform2f(this.renderProgram.getUniformLocation("origin"), 0.0, 1.0);
-        this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
-                          beamOpening + 0.02 / range);
+        if(withTicks) {
+            this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
+                              beamOpening + 0.02 / range);
+        }
+        else {
+            this.gl.uniform1f(this.renderProgram.getUniformLocation("iBeamOpening"),
+                              beamOpening);
+        }
         this.gl.uniform1f(this.renderProgram.getUniformLocation("widthScale"), 
                           0.5 / Math.sin(0.5*beamOpening));
         this.gl.uniform1f(this.renderProgram.getUniformLocation("iRange"), 2.0*range);
@@ -153,7 +179,7 @@ class SonarRenderer extends Renderer
     static fragmentShader =
     `#version 300 es
     #ifdef GL_ES
-    	precision highp float;
+        precision highp float;
     #endif
     
     in vec2 uv;
@@ -212,7 +238,7 @@ class SonarRenderer extends Renderer
 
         this.flipViewMatrix = Matrix.Identity(4);
 
-        this.sonarGrid = new SonarGrid(gl);
+        this.sonarGrid = new SonarGrid(gl, this.view);
     }
 
     horizontal_flip() {
