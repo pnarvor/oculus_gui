@@ -49,16 +49,26 @@ class Tick
         return ticks;
     }
 
-    constructor(value, screenPosition) {
+    constructor(container, value, position) {
         this.value = value;
+        this.container = container;
+
         this.label = document.createElement("div");
+        this.container.appendChild(this.label);
+
         this.label.classList.add("sonar-tick-label");
         this.label.innerHTML = this.value.toString() + "m";
-
+        this.label.style.color = "#9999b3";
         //this.label.style.position = "relative";
         this.label.style.position = "absolute";
-        this.label.style.left = Math.floor(screenPosition[0]).toString() + "px";
-        this.label.style.top  = Math.floor(screenPosition[1]).toString() + "px";
-        this.label.style.color = "#9999b3";
+
+        this.set_position(position);
+    }
+
+    set_position(position) {
+        this.label.style.left = Math.floor(position[0] 
+                              + this.container.offsetLeft).toString() + "px";
+        this.label.style.top  = Math.floor(position[1]
+                              + this.container.offsetTop).toString() + "px";
     }
 };

@@ -60,7 +60,6 @@ class SonarGrid extends Renderer
     constructor(container, gl, view, size = 512, 
                 color = new Float32Array([0.6,0.6,0.7,1.0]))
     {
-        console.log(container);
         super(gl, view,
               SonarGrid.vertexShader,
               SonarGrid.fragmentShader);
@@ -90,14 +89,10 @@ class SonarGrid extends Renderer
         this.targetTicksCount = 5;
     }
     
-    update_beam() {
+    beam_changed() {
         if(this.range == this.view.range && this.beamOpening == this.view.beamOpening) {
             return;
         }
-        this.update_ticks();
-    }
-
-    update_ticks() {
 
         // new range. Clearing current ticks
         for(const t of this.ticks) {
@@ -109,11 +104,9 @@ class SonarGrid extends Renderer
         for(const v of tickValues) {
             if(v <= 0) continue;
             if(v > this.view.range) break;
-            
-            let position = this.get_tick_position(v);
-            let tick = new Tick(v, [position[0] + 10 + this.container.offsetLeft,
-                                    position[1] - 20 + this.container.offsetTop]);
-            this.container.appendChild(tick.label);
+
+            let tick = new Tick(this.container, v,
+                                this.get_tick_position(v));
 
             this.ticks.push(tick);
         }
@@ -122,14 +115,28 @@ class SonarGrid extends Renderer
         this.beamOpening = this.view.beamOpening;
     }
 
+    update_tick_positions() {
+        for(let tick of this.ticks) {
+            tick.set_position(this.get_tick_position(tick.value));
+        }
+    }
+
     get_tick_position(range) {
 
         range = 2.0 * range / this.view.range;
         let opening = 0.5*(this.view.beamOpening + 0.02 / range);
         let widthScale = 0.5 / Math.sin(0.5*this.view.beamOpening);
-        
-        return this.view.get_screen_position(range*widthScale*Math.sin(opening),
-                                             1.0 - range*Math.cos(opening));
+
+        let pos =  this.view.get_screen_position(range*widthScale*Math.sin(opening),
+                                                 1.0 - range*Math.cos(opening));
+        let view = this.view.full_matrix();
+        if(view.at(0,0) < 0)
+            pos[0] = this.view.screen.width - pos[0];
+
+        pos[0] += 10;
+        if(view.at(1,1) >= 0) 
+            pos[1] -= 20;
+        return pos;
     }
 
     draw() {

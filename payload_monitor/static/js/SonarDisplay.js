@@ -36,12 +36,17 @@ class SonarDisplay extends Display
 
     vertical_flip() {
         this.pingRenderer.view.vertical_flip();
-        this.sonarGrid.update_ticks();
+        this.sonarGrid.update_tick_positions();
     }
 
     horizontal_flip() {
         this.pingRenderer.view.horizontal_flip();
-        this.sonarGrid.update_ticks();
+        this.sonarGrid.update_tick_positions();
+    }
+
+    match_display_size() {
+        Display.prototype.match_display_size.call(this);
+        this.sonarGrid.update_tick_positions();
     }
 
     async ping_callback(content)
@@ -59,7 +64,7 @@ class SonarDisplay extends Display
             let data = new Uint8Array(await content.fetch_cached_data('data'));
 
             this.pingRenderer.set_ping_data(metadata, data.subarray(metadata.imageOffset));
-            this.sonarGrid.update_beam();
+            this.sonarGrid.beam_changed();
         }
         finally {
             this.busy = false;
