@@ -10,7 +10,6 @@ class RecorderGUI extends ReconfigureClient
         this.isRecording = false;
         
         this.container = reconfContainer;
-        console.log(this.container);
     }
 
     request_config() {
