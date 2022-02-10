@@ -1,7 +1,7 @@
 
 class CameraDisplay extends Display
 {
-    constructor(canvas)
+    constructor(canvas, topicName)
     {
 
         //canvas.cameraDisplay = this;
@@ -17,7 +17,8 @@ class CameraDisplay extends Display
         this.imageRenderer = new ImageRenderer(this.gl);
         this.add_renderer(this.imageRenderer);
 
-        this.imageListener = new RosTopicListener('/camera/image_raw',
+        //this.imageListener = new RosTopicListener('/camera/image_raw',
+        this.imageListener = new RosTopicListener(topicName,
                                                   'sensor_msgs/Image');
         this.imageListener.callbacks.push(this.image_callback.bind(this));
 
@@ -43,7 +44,7 @@ class CameraDisplay extends Display
                 this.imageRenderer.set_rgb_image(
                     new Shape(metadata.width, metadata.height), data);
             }
-            else if(metadata.encoding === "mono8") {
+            else if(metadata.encoding === "mono8" || metadata.encoding === "bayer_rggb8") {
                 this.imageRenderer.set_image(
                     new Shape(metadata.width, metadata.height), data);
             }

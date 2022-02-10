@@ -12,6 +12,8 @@ urlpatterns = [
     path('sonar_monitor',  views.sonar_monitor,  name='sonar_monitor'),
     path('camera_monitor', views.camera_monitor, name='camera_monitor'),
 
+    path('camera_monitor_2', views.camera_monitor_2, name='camera_monitor_2'),
+
     path('view/<str:page>', views.render_page, name='generic_render'),
 
     path('post_data/<str:topicName>', views.post_data, name='post_data'),

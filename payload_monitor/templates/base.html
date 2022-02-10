@@ -29,7 +29,8 @@
             </a>
             <ul id="nav-big" class="left hide-on-med-and-down">
                 <li><a href="{% url 'sonar_monitor'  %}">Sonar</a></li>
-                <li><a href="{% url 'camera_monitor'  %}">Camera</a></li>
+                <!--<li><a href="{% url 'camera_monitor'  %}">Camera</a></li>-->
+                <li><a href="{% url 'camera_monitor_2'  %}">Camera</a></li>
             </ul>
             <ul id="nav-big-right" class="right">
             </ul>
@@ -39,7 +40,8 @@
         </nav>
         <ul id="nav-small" class="sidenav">
             <li><a href="{% url 'sonar_monitor'  %}">Sonar</a></li>
-            <li><a href="{% url 'camera_monitor'  %}">Camera</a></li>
+            <!-- <li><a href="{% url 'camera_monitor'  %}">Camera</a></li> -->
+            <li><a href="{% url 'camera_monitor_2'  %}">Camera</a></li>
         </ul>
         {% block sonar_gui %}{% endblock %}
     </div>
@@ -78,6 +80,7 @@
     <script src="{% static 'js/SonarDisplay.js' %}"></script>
 
     <script src="{% static 'js/CameraDisplay.js' %}"></script>
+    <script src="{% static 'js/CameraDisplay2.js' %}"></script>
 
     <script src="{% static 'js/ReconfigureClient.js' %}"></script>
     <script src="{% static 'js/ReconfigureGUI.js' %}"></script>

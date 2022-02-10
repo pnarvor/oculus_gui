@@ -16,17 +16,26 @@ update_size = function() {
     }
     let innerWidth  = window.innerWidth  - parseInt(main.style.marginRight, 10);
     let innerHeight = window.innerHeight - parseInt($("#top-nav").css("height"), 10);
-    $("#display")[0].naglContext.resize(innerWidth, innerHeight);
+    //$("#display1")[0].naglContext.resize(innerWidth/2, innerHeight);
+    //$("#display2")[0].naglContext.resize(innerWidth/2, innerHeight);
+    $("#display1")[0].naglContext.resize(innerWidth, innerHeight);
 }
 
 $(document).ready(function() {
 
-    let canvas = document.createElement("canvas");
-    //canvas.width = 800;
-    //canvas.height = 600;
-    canvas.setAttribute("id", "display");
-    $("#main")[0].appendChild(canvas);
-    let display = new CameraDisplay(canvas);
+    let canvas1 = document.createElement("canvas");
+    //canvas1.width = 800;
+    //canvas1.height = 600;
+    canvas1.setAttribute("id", "display1");
+    $("#main")[0].appendChild(canvas1);
+    let display1 = new CameraDisplay(canvas1,'/camera0/image_raw');
+
+    // let canvas2 = document.createElement("canvas");
+    // //canvas.width = 800;
+    // //canvas.height = 600;
+    // canvas2.setAttribute("id", "display2");
+    // $("#main")[0].appendChild(canvas2);
+    // let display2 = new CameraDisplay(canvas2,'/camera1/image_raw');
     
     window.onresize = update_size;
     window.onresize();

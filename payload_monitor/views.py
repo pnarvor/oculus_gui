@@ -32,6 +32,10 @@ def sonar_monitor(request):
 def camera_monitor(request):
     return render(request, 'camera_monitor.html')
 
+@ensure_csrf_cookie
+def camera_monitor_2(request):
+    return render(request, 'camera_monitor_2.html')
+
 @csrf_protect
 # @csrf_exempt
 def post_data(request, topicName):
