@@ -14,6 +14,8 @@ urlpatterns = [
 
     path('camera_monitor_2', views.camera_monitor_2, name='camera_monitor_2'),
 
+    path('map', views.map, name='map'),
+
     path('view/<str:page>', views.render_page, name='generic_render'),
 
     path('post_data/<str:topicName>', views.post_data, name='post_data'),

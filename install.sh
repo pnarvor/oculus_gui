@@ -51,3 +51,7 @@ wget -O payload_monitor/static/js/libs/three.js https://raw.githubusercontent.co
 wget -O payload_monitor/static/js/libs/OrbitControl.js https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/controls/OrbitControls.js
 
 # wget -O payload_monitor/static/js/libs/pixi.js https://pixijs.download/release/pixi.js
+
+# leaflet
+wget -O payload_monitor/static/js/libs/leaflet.js https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js
+wget -O payload_monitor/static/css/libs/leaflet.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css

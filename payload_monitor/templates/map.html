@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block additional_head %}
+    <link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block additional_body %}
+    <div id="map" style="width:100%; height:100%;"></div>
+{% endblock %}
+
+{% block additional_scripts %}
+    <script src="{% static 'js/libs/leaflet.js' %}"></script>
+    <script src="{% static 'js/map.js' %}"></script>
+{% endblock %}
+
+
+
+
+
+

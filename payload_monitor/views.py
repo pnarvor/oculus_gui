@@ -36,6 +36,10 @@ def camera_monitor(request):
 def camera_monitor_2(request):
     return render(request, 'camera_monitor_2.html')
 
+@ensure_csrf_cookie
+def map(request):
+    return render(request, 'map.html')
+
 @csrf_protect
 # @csrf_exempt
 def post_data(request, topicName):
