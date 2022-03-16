@@ -55,3 +55,7 @@ wget -O payload_monitor/static/js/libs/OrbitControl.js https://raw.githubusercon
 # leaflet
 wget -O payload_monitor/static/js/libs/leaflet.js https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js
 wget -O payload_monitor/static/css/libs/leaflet.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css
+
+
+# GPS.js (for parsing NMEA strings)
+wget -O payload_monitor/static/js/libs/gps.js https://raw.githubusercontent.com/infusion/GPS.js/master/gps.js

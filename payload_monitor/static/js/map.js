@@ -1,41 +1,93 @@
+class GpsTrace
+{
+    constructor(map, maxBufferLength = 10)
+    {
+        this.map = map;
+        this.maxBufferLength = maxBufferLength;
 
+        this.buffer = []
+        this.trace  = undefined;
+        this.marker = undefined;
+    }
+
+    update(lat, lon)
+    {
+        // updating marker position
+        if(typeof this.marker === 'undefined') {
+            this.marker = L.marker([lat, lon]).addTo(this.map);
+        }
+        
+        // undating buffer
+        this.buffer.push([lat, lon]);
+
+        if(this.buffer.length < this.maxBufferLength) {
+            return;
+        }
+
+        // buffer is full. Updating displayed trace.
+        if(typeof this.trace === 'undefined') {
+            this.trace = L.polyline(this.buffer).addTo(this.map);
+        }
+        else {
+            for(let point of this.buffer) {
+                this.trace.addLatLng(point);
+            }
+        }
+        this.marker.setLatLng(this.buffer[this.buffer.length - 1]);
+        
+        this.buffer = [];
+    }
+};
 
 class GpsDisplay
 {
     constructor(mapDiv, topicNames)
     {
         this.mapDiv = mapDiv;
-
         this.mapDiv.gpsDisplay = this;
 
         this.build_map();
-        
+        this.receivedOne = false;
 
-        // this.msgSubscriber = new RosTopicListener(topicName, 'hemisphere_v500/StampedString');
-        // this.msgSubscriber.callbacks.push(this.gps_callback.bind(this, topicName));
+        this.traces = {};
         
         this.subscribers = []
+        //this.nmeaParsers = []
         for(let topicName of topicNames) {
             let subscriber = new RosTopicListener(topicName, 'hemisphere_v500/StampedString');
-            subscriber.callbacks.push(this.gps_callback.bind(this));
+            let nmeaParser = new GPS;
+            subscriber.callbacks.push(this.gps_callback.bind(this, nmeaParser));
             this.subscribers.push(subscriber);
         }
     }
 
-    async gps_callback(content)
+    async gps_callback(parser, content)
     {
-        console.log(content.content.topic);
         let data = JSON.parse(content.content.scalars);
-        console.log(data);
+        parser.update(data.data);
+
+        if(data.data.includes("GGA")) {
+            let topicName = content.content.topic;
+
+            let lat = parser.state.lat;
+            let lon = parser.state.lon;
+            
+            if((topicName in this.traces) === false) {
+                this.traces[topicName] = new GpsTrace(this.map);
+            }
+            this.traces[topicName].update(lat, lon);
+
+            if(!this.receivedOne) {
+                this.map.setView({lat : lat, lon : lon}, 18);
+                this.receivedOne = true;
+            }
+        }
     }
 
-    build_map(firstViewTarget = {lon: 0, lat: 0})
+    build_map(firstViewTarget = {lon: 0, lat: 0},
+              firstZoom = 2)
     {
-        if(typeof this.map !== 'undefined') {
-            return;
-        }
-
-        this.map = L.map('map').setView(firstViewTarget, 2);
+        this.map = L.map('map').setView(firstViewTarget, firstZoom);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
