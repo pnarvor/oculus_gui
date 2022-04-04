@@ -27,7 +27,9 @@ $(document).ready(function() {
     imageDiv1.style.height = 'auto';
     $("#main")[0].appendChild(imageDiv1);
     let display1 = new CameraDisplay2(imageDiv1,
-                                      "/camera0/image_raw/compressed",
+                                      //"/camera0/image_raw/compressed",
+                                      //"/stereo/left/image_raw/compressed",
+                                      "/stereo/left/image_raw/munu_compressed/compressed",
                                       "sensor_msgs/CompressedImage");
     
     let imageDiv2 = document.createElement("img");
@@ -35,7 +37,9 @@ $(document).ready(function() {
     imageDiv2.style.height = 'auto';
     $("#main")[0].appendChild(imageDiv2);
     let display2 = new CameraDisplay2(imageDiv2,
-                                      "/camera1/image_raw/compressed",
+                                      //"/camera1/image_raw/compressed",
+                                      //"/stereo/right/image_raw/compressed",
+                                      "/stereo/right/image_raw/munu_compressed/compressed",
                                       "sensor_msgs/CompressedImage");
     
 
