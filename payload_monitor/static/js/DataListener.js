@@ -8,7 +8,7 @@ class DataInfo
     {
         // Two requests are sent to the server, the data is transfered twice.
         // (investigate)
-        content = this.content.vectors[name]
+        let content = this.content.vectors[name]
         return new Promise(function(resolve, reject) {
             let request = new XMLHttpRequest();
             request.open("GET", content.cache_request_uri + content.data_uuid, true);
