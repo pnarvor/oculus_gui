@@ -8,7 +8,7 @@ class DataInfo
     {
         // Two requests are sent to the server, the data is transfered twice.
         // (investigate)
-        let content = this.content.vectors[name]
+        let content = this.content.vectors[name];
         return new Promise(function(resolve, reject) {
             let request = new XMLHttpRequest();
             request.open("GET", content.cache_request_uri + content.data_uuid, true);
@@ -38,12 +38,14 @@ class DataListener
 
     async update(e)
     {
-        console.log("Got data");
+        let data = new DataInfo(JSON.parse(e.data));
+        for(const callback of this.callbacks) {
+            callback(data);
+        }
+    }
 
-        //let data = new DataInfo(JSON.parse(e.data));
-        //for(const callback of this.callbacks) {
-        //    callback(data);
-        //}
+    add_callback(callback) {
+        this.callbacks.push(callback)
     }
 };
 

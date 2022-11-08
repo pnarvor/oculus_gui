@@ -1,6 +1,10 @@
 import uuid
+import json
 import threading
 import oculus_python
+
+from .cache import cache
+from .data_serialization import serialize
 
 class OculusLink:
     
@@ -24,11 +28,29 @@ class OculusLink:
             del self.ping_callbacks[callbackId]
 
     def ping_callback(self, metadata, data):
+
+        serialized = serialize(type(metadata).__name__, metadata, data)
+        # print(serialized)
+
+        msg = {'type' : 'empty', 'scalars' : 'None', 'vectors' : 'None'}
+        if 'scalars' in serialized.keys():
+            msg['scalars'] = json.dumps(serialized['scalars'])
+            msg['type']    = 'form_data'
+        if 'vectors' in serialized.keys():
+            msg['type']    = 'cached_data'
+            msg['vectors'] = {}
+            for name, data in serialized['vectors'].items():
+                dataUuid = cache.insert(data[1])
+                msg['vectors'][name] = {
+                    'data_uuid' : dataUuid,
+                    'cache_request_uri' : '/oculus_gui/get_cached_data/'}
+
+        encoded = json.dumps(msg, ensure_ascii=True)
         callbacks = []
         with self.lock:
             callbacks = [c for c in self.ping_callbacks.values()]
         for c in callbacks:
-            c(metadata, data)
+            c(encoded)
 
 
-        
+

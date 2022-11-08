@@ -126,3 +126,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Daphne
 ASGI_APPLICATION = "main_setup.asgi.application"
+
+
+# trying to add decent logging (fail)
+# DEBUG_PROPAGATE_EXCEPTIONS = True
+# LOGGING = {
+#     'version': 1,
+#     'handlers': {
+#         'console':{
+#             'level':'DEBUG',
+#             'class':'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.request': {
+#             'handlers':['console'],
+#             'propagate': True,
+#             'level':'DEBUG',
+#         }
+#     },
+# }
+
