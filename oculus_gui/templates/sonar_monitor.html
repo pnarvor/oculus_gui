@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block additional_head %}
+    <!-- <link rel="stylesheet" href="{% static 'css/sonar_monitor.css' %}" type="text/css"/> -->
+{% endblock %}
+
+{% block sonar_gui %}
+    <!-- <div class="row sonar-gui">
+        <div class="col s1 sonar-button-col">
+            <div class="row flexbox sonar-btn-row"><div class="col">
+                <a class="waves-effect waves-light btn-large sonar-vflip">
+                    <i class="material-icons" style="font-size:48px;">swap_vert</i>
+                </a>
+            </div></div>
+            <div class="row flexbox sonar-btn-row"><div class="col">
+                <a class="waves-effect waves-light btn-large sonar-hflip">
+                    <i class="material-icons" style="font-size:48px;">swap_horiz</i>
+                </a>
+            </div></div>
+        </div>
+        <div class="col s11 sonar-display-col">
+            <canvas class="sonar-canvas"/>
+        </div>
+    </div> -->
+{% endblock %}
+
+{% block additional_scripts %}
+    <script src="{% static 'js/sonar_monitor.js' %}"></script>
+{% endblock %}
+
+
+
+
+
+
