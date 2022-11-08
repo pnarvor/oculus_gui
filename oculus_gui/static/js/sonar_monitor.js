@@ -8,11 +8,14 @@ async function fetch_data_test(dataInfo) {
 
 
 $(document).ready(function() {
-    let displayDiv = $(".sonar-gui")[0];
-    console.log(displayDiv);
-    
-    let dataFetcher = new DataListener('/ws/sonar_data/');
-    displayDiv.dataFetcher = dataFetcher;
 
-    dataFetcher.add_callback(fetch_data_test)
+    let display = new SonarDisplay($(".sonar-gui")[0]);
+
+    //let displayDiv = $(".sonar-gui")[0];
+    //console.log(displayDiv);
+    //
+    //let dataFetcher = new DataListener('/ws/sonar_data/');
+    //displayDiv.dataFetcher = dataFetcher;
+
+    //dataFetcher.add_callback(fetch_data_test)
 });

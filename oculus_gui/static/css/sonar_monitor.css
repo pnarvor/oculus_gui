@@ -1,0 +1,36 @@
+
+.sonar-button-col, .sonar-display-col {
+    padding: 0px !important;
+    margin: 0px !important;
+    height: 100%;
+}
+
+/* Why -8px ? */
+.sonar-gui {
+    padding: 0px !important;
+    margin: 0px !important;
+    height: calc(100vh - 64px - 8px) !important;
+}
+
+.sonar-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.sonar-btn-row {
+    display: flex;
+    flew-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.sonar-infos {
+    margin-left: 10px;
+}
+
+.sonar-tick-label {
+    position: absolute;
+    color:    #9999b3;
+}

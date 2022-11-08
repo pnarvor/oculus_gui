@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block additional_head %}
-    <!-- <link rel="stylesheet" href="{% static 'css/sonar_monitor.css' %}" type="text/css"/> -->
+    <link rel="stylesheet" href="{% static 'css/sonar_monitor.css' %}" type="text/css"/>
 {% endblock %}
 
 {% block sonar_gui %}
@@ -26,6 +26,26 @@
 {% endblock %}
 
 {% block additional_scripts %}
+    
+    <script src="{% static 'js/nagl/maths/Matrix.js' %}"></script>
+    <script src="{% static 'js/nagl/maths/Shape.js' %}"></script>
+    <script src="{% static 'js/nagl/ShaderUtils.js' %}"></script>
+    <script src="{% static 'js/nagl/Colormap.js' %}"></script>
+    <script src="{% static 'js/nagl/Ticks.js' %}"></script>
+
+    <script src="{% static 'js/nagl/views/View.js' %}"></script>
+    <script src="{% static 'js/nagl/views/ImageView.js' %}"></script>
+
+    <script src="{% static 'js/nagl/renderers/Renderer.js' %}"></script>
+    <script src="{% static 'js/nagl/renderers/ImageRenderer.js' %}"></script>
+
+    <script src="{% static 'js/nagl/Display.js' %}"></script>
+
+    <script src="{% static 'js/SonarView.js' %}"></script>
+    <script src="{% static 'js/SonarRenderer.js' %}"></script>
+    <script src="{% static 'js/SonarGrid.js' %}"></script>
+    <script src="{% static 'js/SonarDisplay.js' %}"></script>
+
     <script src="{% static 'js/DataListener.js' %}"></script>
     <script src="{% static 'js/sonar_monitor.js' %}"></script>
 {% endblock %}
