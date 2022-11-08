@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block sonar_gui %}
-    <!-- <div class="row sonar-gui">
+    <div class="row sonar-gui">
         <div class="col s1 sonar-button-col">
             <div class="row flexbox sonar-btn-row"><div class="col">
                 <a class="waves-effect waves-light btn-large sonar-vflip">
@@ -22,10 +22,11 @@
         <div class="col s11 sonar-display-col">
             <canvas class="sonar-canvas"/>
         </div>
-    </div> -->
+    </div>
 {% endblock %}
 
 {% block additional_scripts %}
+    <script src="{% static 'js/DataListener.js' %}"></script>
     <script src="{% static 'js/sonar_monitor.js' %}"></script>
 {% endblock %}
 
