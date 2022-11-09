@@ -56,7 +56,7 @@ class ReconfigureConsumer(WebsocketConsumer):
         sonarLink.remove_ping_callback(self.callbackId)
         self.callbackId = sonarLink.add_config_callback(self.send_current_config)
 
-        description = oculus_link.parameter_description(sonarLink.sonar.current_config())
+        description = sonarLink.get_parameter_description()
         self.send(json.dumps({'type'    : 'description',
                               'payload' :  description}))
 

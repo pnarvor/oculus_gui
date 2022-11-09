@@ -3,8 +3,7 @@ import json
 import threading
 import oculus_python
 
-from .data_serialization import serialize
-
+from .oculus_converters import serializers
 from .oculus_parameters import parameter_description
 from .oculus_parameters import from_OculusSimpleFireMessage
 from .oculus_parameters import update_OculusSimpleFireMessage
@@ -21,6 +20,9 @@ class OculusLink:
         self.sonar.add_ping_callback(self.ping_callback)
         self.sonar.add_config_callback(self.config_callback)
         self.sonar.start()
+
+    def get_parameter_description(self):
+        return parameter_description(self.sonar.current_config())
 
     def add_ping_callback(self, callback):
         with self.lock:
@@ -41,7 +43,7 @@ class OculusLink:
         if len(callbacks) == 0:
             return
 
-        serialized = serialize(type(metadata).__name__, metadata, data)
+        serialized = serializers[type(metadata).__name__][1](metadata, data)
 
         for c in callbacks:
             c(serialized)
