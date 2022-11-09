@@ -6,7 +6,7 @@ def from_OculusSimpleFireMessage(fireMessage):
             'data_depth'       : (fireMessage.flags & 0x02) > 0,
             'nbeams'           : (fireMessage.flags & 0x40) > 0,
             'send_gain'        : (fireMessage.flags & 0x04) > 0,
-            'gain_assist'      : (fireMessage.flags & 0x10) > 0,
+            'gain_assist'      : (fireMessage.flags & 0x10) == 0,
             'range'            : fireMessage.range,
             'gamma_correction' : fireMessage.gammaCorrection,
             'gain_percent'     : fireMessage.gainPercent,
@@ -34,8 +34,8 @@ def to_OculusSimpleFireMessage(data):
         fireMessage.flags = fireMessage.flags | 0x40
     if data['send_gain']:
         fireMessage.flags = fireMessage.flags | 0x04
-    if data['gain_assist']:
-        fireMessage.flags = fireMessage.flags | 0x10
+    if not data['gain_assist']:
+        fireMessage.flags = fireMessage.flags | 0x10 # setup inverted on the sonar
     if data['use_salinity']:
         fireMessage.speedOfSound = 0
 
@@ -43,10 +43,8 @@ def to_OculusSimpleFireMessage(data):
 
 
 def update_OculusSimpleFireMessage(fireMessage, request):
-    print(request)
     updatedRequest = from_OculusSimpleFireMessage(fireMessage)
     updatedRequest.update(request)
-    print(updatedRequest)
     return to_OculusSimpleFireMessage(updatedRequest)
     
 
@@ -101,9 +99,9 @@ def parameter_description(currentConfig):
              'description': 'Enable auto gain.',
              'type': 'bool',
              'default': False,
-             # 'edit_method': {'type': 'bool'},
-             'edit_method': {'type': 'fixed'},
-             'current_value': False
+             'edit_method': {'type': 'bool'},
+             # 'edit_method': {'type': 'fixed'},
+             'current_value': True
             },
             {'name': 'range',
              'description': 'Sonar range (in meters)',

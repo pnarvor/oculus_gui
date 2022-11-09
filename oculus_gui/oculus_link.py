@@ -14,12 +14,12 @@ class OculusLink:
     def __init__(self):
 
         self.pingCallbacks       = {}
-        self.parametersCallbacks = {}
+        self.configCallbacks = {}
         self.lock = threading.Lock();
 
         self.sonar = oculus_python.OculusSonar()
         self.sonar.add_ping_callback(self.ping_callback)
-        self.sonar.add_ping_callback(self.parameters_callback)
+        self.sonar.add_config_callback(self.config_callback)
         self.sonar.start()
 
     def add_ping_callback(self, callback):
@@ -46,27 +46,26 @@ class OculusLink:
         for c in callbacks:
             c(serialized)
 
-    def add_parameters_callback(self, callback):
+    def add_config_callback(self, callback):
         with self.lock:
             callbackId = str(uuid.uuid4())
-            self.parametersCallbacks[callbackId] = callback
+            self.configCallbacks[callbackId] = callback
         return callbackId
 
-    def remove_parameters_callback(self, callbackId):
+    def remove_config_callback(self, callbackId):
         with self.lock:
-            del self.parametersCallbacks[callbackId]
+            del self.configCallbacks[callbackId]
 
-    def parameters_callback(self, metadata, data):
+    def config_callback(self, lastConfig, newConfig):
         callbacks = []
         with self.lock:
-            callbacks = [c for c in self.parametersCallbacks.values()]
+            callbacks = [c for c in self.configCallbacks.values()]
 
         if len(callbacks) == 0:
             return
-        config = from_OculusSimpleFireMessage(self.sonar.current_config())
+        config = from_OculusSimpleFireMessage(newConfig)
         for c in callbacks:
             c(config)
-        
 
     def reconfigure(self, request):
         config = self.sonar.current_config()

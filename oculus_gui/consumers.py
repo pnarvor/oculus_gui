@@ -1,5 +1,4 @@
 import json
-import time
 
 from channels.generic.websocket import WebsocketConsumer
 
@@ -55,19 +54,13 @@ class ReconfigureConsumer(WebsocketConsumer):
         # print(data['scalars'])
         global sonarLink
         sonarLink.remove_ping_callback(self.callbackId)
-        self.callbackId = sonarLink.add_parameters_callback(self.send_current_config)
+        self.callbackId = sonarLink.add_config_callback(self.send_current_config)
 
         description = oculus_link.parameter_description(sonarLink.sonar.current_config())
         self.send(json.dumps({'type'    : 'description',
                               'payload' :  description}))
-        self.lastConfigDate = time.time()
 
     def send_current_config(self, config):
-        if time.time() - self.lastConfigDate < 2.0:
-            return
-        self.lastConfigDate = time.time()
-
-        # print(config) 
         self.send(json.dumps({'type'    : 'config',
                               'payload' : config}))
 
