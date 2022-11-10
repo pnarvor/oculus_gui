@@ -98,3 +98,9 @@ class OculusLink:
        
     def is_recording(self):
         return self.sonar.is_recording()
+
+    def recorder_start(self, filename, overwrite):
+        self.sonar.recorder_start(filename, overwrite)
+
+    def recorder_stop(self):
+        self.sonar.recorder_stop()

@@ -82,3 +82,12 @@ class OculusLink:
         # newConfig = update_OculusSimpleFireMessage(config, request)
         # self.sonar.send_config(newConfig)
         
+    # following function are for compliance with oculus_link interface
+    def is_recording(self):
+        return False
+
+    def recorder_start(self, filename, overwrite):
+        pass
+
+    def recorder_stop(self):
+        pass
