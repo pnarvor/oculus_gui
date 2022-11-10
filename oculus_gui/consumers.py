@@ -114,7 +114,7 @@ class RecorderConsumer(WebsocketConsumer):
         global sonarLink
         import os
         if data['payload']['recording']:
-            filename = os.path.join(os.environ['HOME'], 'output.oculus')
+            filename = os.path.join(os.environ['HOME'], data['payload']['filename'])
             sonarLink.recorder_start(filename, True)
         else:
             sonarLink.recorder_stop()

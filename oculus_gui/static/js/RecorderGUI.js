@@ -105,6 +105,20 @@ class RecorderGUI extends ReconfigureClient
         modalContent.appendChild(this.confirmationMessage);
         modalDiv.appendChild(modalContent);
         
+        let filenameInputDiv = document.createElement("div");
+        filenameInputDiv.classList.add("input-field", "col", "s3");
+        let modalTextInput = document.createElement("input");
+        modalTextInput.setAttribute("id", "modal-text-input");
+        modalTextInput.setAttribute("placeholder", "Filename here");
+        modalTextInput.setAttribute("type", "text");
+        modalTextInput.classList.add("validate");
+        let modalTextLabel = document.createElement("label");
+        modalTextLabel.setAttribute("for","modal-text-input");
+        modalTextLabel.innerHTML = "Filename";
+        filenameInputDiv.appendChild(modalTextInput);
+        filenameInputDiv.appendChild(modalTextLabel);
+        modalDiv.appendChild(filenameInputDiv);
+
         // Modal footer (buttons)
         let modalFooter = document.createElement("div");
         modalFooter.classList.add("modal-footer");
@@ -127,9 +141,30 @@ class RecorderGUI extends ReconfigureClient
 
         this.container.appendChild(modalDiv);
 
-        $('.modal').modal();
+        //modalDiv.onOpenStart = this.modal_opened.bind(this);
 
-        //console.log(this.container);
+        $('.modal').modal({
+            onOpenStart : this.modal_opened.bind(this),
+        });
+
+        console.log(modalDiv);
+    }
+
+    modal_opened() {
+        let date = new Date();
+        let datestring = date.getFullYear()  + "_"
+                       + date.getMonth()   + "_"
+                       + date.getDay()     + "_"
+                       + date.getHours()   + "_"
+                       + date.getMinutes() + "_"
+                       + date.getSeconds();
+        console.log(datestring);
+        if(!this.isRecording) {
+            $("#modal-text-input")[0].value = "oculus_record_" + datestring + ".oculus";
+        }
+        else {
+            $("#modal-text-input")[0].value = "";
+        }
     }
 
     toggle_recording() {
@@ -141,7 +176,8 @@ class RecorderGUI extends ReconfigureClient
         else {
             this.websocket.send(JSON.stringify(
                 {type    : "config_request",
-                 payload : { recording : true } } ));
+                 payload : { recording : true,
+                             filename  : $("#modal-text-input")[0].value} } ));
         }
     }
 };
