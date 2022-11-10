@@ -1,30 +1,37 @@
 import uuid
 import json
 import threading
-import oculus_python
 
-from .oculus_converters import serializers
+import rclpy
+from rclpy.node import Node
+import oculus_interfaces.msg as oculus_msg
+
+from .oculus_converters_ros2 import serializers
 from .oculus_parameters import parameter_description
 from .oculus_parameters import from_OculusSimpleFireMessage
 from .oculus_parameters import update_OculusSimpleFireMessage
 
-class OculusLink:
+class OculusLink(Node):
     
     def __init__(self):
+        rclpy.init()
+        super().__init__('oculus_gui')
 
-        self.pingCallbacks   = {}
+        self.pingCallbacks       = {}
         self.configCallbacks = {}
-        self.statusCallbacks = {}
         self.lock = threading.Lock();
 
-        self.sonar = oculus_python.OculusSonar()
-        self.sonar.add_ping_callback(self.ping_callback)
-        self.sonar.add_config_callback(self.config_callback)
-        self.sonar.add_status_callback(self.status_callback)
-        self.sonar.start()
+        self.pingSub = self.create_subscription(oculus_msg.OculusStampedPing,
+                                                '/ping',
+                                                self.ping_callback,
+                                                10)
+        # self.sonar.add_ping_callback(self.ping_callback)
+        # self.sonar.add_config_callback(self.config_callback)
+        # self.sonar.start()
 
     def get_parameter_description(self):
-        return parameter_description(self.sonar.current_config())
+        # return parameter_description(self.sonar.current_config())
+        return []
 
     def add_ping_callback(self, callback):
         with self.lock:
@@ -36,7 +43,7 @@ class OculusLink:
         with self.lock:
             del self.pingCallbacks[callbackId]
 
-    def ping_callback(self, metadata, data):
+    def ping_callback(self, msg):
 
         callbacks = []
         with self.lock:
@@ -45,7 +52,7 @@ class OculusLink:
         if len(callbacks) == 0:
             return
 
-        serialized = serializers[type(metadata).__name__][1](metadata, data)
+        serialized = serializers[type(msg).__name__][1](msg)
 
         for c in callbacks:
             c(serialized)
@@ -71,30 +78,9 @@ class OculusLink:
         for c in callbacks:
             c(config)
 
-    def add_status_callback(self, callback):
-        with self.lock:
-            callbackId = str(uuid.uuid4())
-            self.statusCallbacks[callbackId] = callback
-        return callbackId
-
-    def remove_status_callback(self, callbackId):
-        with self.lock:
-            del self.statusCallbacks[callbackId]
-
-    def status_callback(self, status):
-        callbacks = []
-        with self.lock:
-            callbacks = [c for c in self.statusCallbacks.values()]
-
-        if len(callbacks) == 0:
-            return
-        for c in callbacks:
-            c(status)
-
     def reconfigure(self, request):
-        config = self.sonar.current_config()
-        newConfig = update_OculusSimpleFireMessage(config, request)
-        self.sonar.send_config(newConfig)
-       
-    def is_recording(self):
-        return self.sonar.is_recording()
+        pass
+        # config = self.sonar.current_config()
+        # newConfig = update_OculusSimpleFireMessage(config, request)
+        # self.sonar.send_config(newConfig)
+        

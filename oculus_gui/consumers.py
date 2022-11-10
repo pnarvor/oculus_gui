@@ -72,3 +72,50 @@ class ReconfigureConsumer(WebsocketConsumer):
         sonarLink.reconfigure(data['payload'])        
 
 
+class RecorderConsumer(WebsocketConsumer):
+
+    def connect(self):
+        global sonarLink
+        self.callbackId = sonarLink.add_status_callback(self.send_description)
+        self.accept()
+
+    def disconnect(self, closeCode):
+        global sonarLink
+        sonarLink.remove_ping_callback(self.callbackId)
+        print("ReconfigureConsumer disconnected (code " + str(closeCode) + ")")
+
+    def send_description(self, msg):
+        global sonarLink
+        sonarLink.remove_status_callback(self.callbackId)
+        self.callbackId = sonarLink.add_status_callback(self.send_current_config)
+
+        description = [{'name'          : 'recording',
+                        'description'   : 'True if sonar is recording',
+                        'type'          : 'bool',
+                        'default'       : False,
+                        'edit_method'   : {'type' : 'bool'},
+                        'current_value' : sonarLink.is_recording()}]
+
+        self.send(json.dumps({'type'    : 'description',
+                              'payload' :  description}))
+
+    def send_current_config(self, msg):
+        global sonarLink
+        config = {'recording' : sonarLink.is_recording()}
+        self.send(json.dumps({'type'    : 'config',
+                              'payload' : config}))
+
+    def receive(self, text_data):
+        data = json.loads(text_data)
+        if data['type'] != 'config_request':
+            return
+        if 'recording' not in data['payload'].keys():
+            return
+        global sonarLink
+        import os
+        if data['payload']['recording']:
+            filename = os.path.join(os.environ['HOME'], 'output.oculus')
+            sonarLink.sonar.recorder_start(filename, True)
+        else:
+            sonarLink.sonar.recorder_stop()
+

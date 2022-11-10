@@ -209,7 +209,7 @@ class ReconfigureGUI extends ReconfigureClient
     }
 
     on_description(configDesc) {
-        console.log(configDesc);
+        //console.log(configDesc);
         this.configDescription = configDesc;
         this.generate_gui(this.configDescription);
     }
