@@ -105,17 +105,38 @@ def from_OculusStampedPing(msg):
             'imageOffset'       : msg.ping.imageOffset,
             'imageSize'         : msg.ping.imageSize,
             'messageSize'       : msg.ping.messageSize}
-    
+
+def from_Ping(msg):
+    return {'type'              : 'Ping',
+            'pingId'            :  msg.pingId,
+            'pingFiringDate'    :  msg.pingFiringDate,
+            'range'             :  msg.range,
+            'gainPercent'       :  msg.gainPercent,
+            'frequency'         :  msg.frequency,
+            'speedOfSoundUsed'  :  msg.speedOfSoundUsed,
+            'rangeResolution'   :  msg.rangeResolution,
+            'temperature'       :  msg.temperature,
+            'pressure'          :  msg.pressure,
+            'masterMode'        :  msg.masterMode,
+            'hasGains'          :  msg.hasGains,
+            'nRanges'           :  msg.nRanges,
+            'nBeams'            :  msg.nBeams,
+            'step'              :  msg.step,
+            'sampleSize'        :  msg.sampleSize,
+            'bearingDataOffset' :  msg.bearingDataOffset,
+            'pingDataOffset'    :  msg.pingDataOffset}
+
+
 
 serializers = {
-'OculusHeader'      : (oculus_msg.OculusHeader, 
+'OculusHeader'      : (oculus_msg.OculusHeader,
                        lambda msg: {'scalars' : from_OculusHeader(msg),
                                     'vectors' : {}}),
 'OculusVersionInfo' : (oculus_msg.OculusVersionInfo,
                        lambda msg: {'scalars' : from_OculusVersionInfo(msg),
                                     'vectors' : {}}),
 'OculusStatus'      : (oculus_msg.OculusStatus,
-                       lambda msg: {'scalars' : from_OculusStatus(msg), 
+                       lambda msg: {'scalars' : from_OculusStatus(msg),
                                     'vectors' : {}}),
 'OculusFireConfig'  : (oculus_msg.OculusFireConfig,
                        lambda msg: {'scalars' : from_OculusFireConfig(msg),
@@ -125,7 +146,10 @@ serializers = {
                                     'vectors' : {'data' : ('data',  msg.data)}}),
 'OculusStampedPing' : (oculus_msg.OculusStampedPing,
                        lambda msg: {'scalars' : from_OculusStampedPing(msg),
-                                    'vectors' : {'data' : ('data',  msg.ping.data)}})
+                                    'vectors' : {'data' : ('data',  msg.ping.data)}}),
+'Ping'              : (oculus_msg.Ping,
+                       lambda msg: {'scalars' : from_Ping(msg),
+                                    'vectors' : {'data' : ('data',  msg.data)}})
 }
 
 

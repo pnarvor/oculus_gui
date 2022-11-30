@@ -73,15 +73,15 @@ class SonarRenderer extends Renderer
     }
 
     set_ping_data(metadata, data) {
-        if(metadata.fireMessage.masterMode == 1) {
+        if(metadata.masterMode == 1) {
             this.view.set_beam_opening(130.0 * Math.PI / 180.0);
         }
         else {
             this.view.set_beam_opening(80.0 * Math.PI / 180.0);
         }
-        this.view.set_range(metadata.fireMessage.range);
+        this.view.set_range(metadata.range);
         
-        this.gainSent = (metadata.fireMessage.flags & 0x4) != 0;
+        this.gainSent = metadata.hasGains;
         this.nBeams = metadata.nBeams;
         // gain is interleaved with data
         if(!this.gainSent) {

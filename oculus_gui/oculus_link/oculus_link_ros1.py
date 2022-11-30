@@ -21,7 +21,7 @@ class OculusLink:
         # self.sonar = oculus_python.OculusSonar()
         rospy.init_node('oculus_gui', anonymous=True, disable_signals=True)
         self.pingSub = rospy.Subscriber('/oculus_sonar/ping',
-                                        oculus_msg.OculusStampedPing,
+                                        oculus_msg.Ping,
                                         self.ping_callback)
         # self.sonar.add_ping_callback(self.ping_callback)
         # self.sonar.add_config_callback(self.config_callback)
@@ -49,7 +49,7 @@ class OculusLink:
 
         if len(callbacks) == 0:
             return
-
+        
         serialized = serializers[type(msg).__name__][1](msg)
 
         for c in callbacks:

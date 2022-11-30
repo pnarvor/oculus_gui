@@ -36,7 +36,7 @@ class OculusLink:
         with self.lock:
             del self.pingCallbacks[callbackId]
 
-    def ping_callback(self, metadata, data):
+    def ping_callback(self, pingMsg):
 
         callbacks = []
         with self.lock:
@@ -44,7 +44,9 @@ class OculusLink:
 
         if len(callbacks) == 0:
             return
-
+        
+        metadata = pingMsg.metadata()
+        data     = pingMsg.data()
         serialized = serializers[type(metadata).__name__][1](metadata, data)
 
         for c in callbacks:
