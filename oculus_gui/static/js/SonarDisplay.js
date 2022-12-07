@@ -63,7 +63,14 @@ class SonarDisplay extends Display
             let metadata = JSON.parse(content.content.scalars);
             let data = new Uint8Array(await content.fetch_cached_data('data'));
 
-            this.pingRenderer.set_ping_data(metadata, data.subarray(metadata.imageOffset));
+            let bearingOffset = 61;
+            if(metadata.fireMessage.head.msgVersion == 2) {
+                bearingOffset = 101;
+            }
+            let bearings = new Int16Array(data.buffer).subarray(61);
+            this.pingRenderer.set_ping_data(metadata, 
+                                            bearings,
+                                            data.subarray(metadata.imageOffset));
             this.sonarGrid.beam_changed();
         }
         finally {

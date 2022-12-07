@@ -72,16 +72,15 @@ class SonarRenderer extends Renderer
         this.zeroColor = this.colormap.minColor;
     }
 
-    set_ping_data(metadata, data) {
-        if(metadata.masterMode == 1) {
-            this.view.set_beam_opening(130.0 * Math.PI / 180.0);
-        }
-        else {
-            this.view.set_beam_opening(80.0 * Math.PI / 180.0);
-        }
-        this.view.set_range(metadata.range);
+    set_ping_data(metadata, bearings, data) {
+
+        this.view.set_beam_opening(-0.02 * bearings[0] * Math.PI / 180.0);
+        this.view.set_range(metadata.fireMessage.range);
         
         this.gainSent = (metadata.fireMessage.flags & 0x4) != 0;
+        if(metadata.fireMessage.head.msgVersion == 2) {
+            this.gainSent = false;
+        }
         this.nBeams = metadata.nBeams;
         // gain is interleaved with data
         if(!this.gainSent) {
