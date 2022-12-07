@@ -81,7 +81,7 @@ class SonarRenderer extends Renderer
         }
         this.view.set_range(metadata.range);
         
-        this.gainSent = metadata.hasGains;
+        this.gainSent = (metadata.fireMessage.flags & 0x4) != 0;
         this.nBeams = metadata.nBeams;
         // gain is interleaved with data
         if(!this.gainSent) {
