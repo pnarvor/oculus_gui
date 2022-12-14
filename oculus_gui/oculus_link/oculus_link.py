@@ -21,6 +21,9 @@ class OculusLink:
         self.sonar.add_ping_callback(self.ping_callback)
         self.sonar.add_config_callback(self.config_callback)
         self.sonar.add_status_callback(self.status_callback)
+
+        self.sonar.enable_info_broadcast(26221)
+
         self.sonar.start()
 
     def get_parameter_description(self):
